@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Practice quiz for the Databricks Certified Data Engineer Professional and Associate exams.">
+<style>html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Lakehouse Pro Quiz</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column. Sticker-style UI: flat bright fills, thick ink borders, hard offset shadows. Each exam section owns one colour (--c) that follows it everywhere. */
+:root{
+  --bg:#EAF4FF; --surface:#FFFFFF; --ink:#14123A; --muted:#4D4B78; --line:#C3D2EC; --edge:#14123A; --dots:#B7C9E8;
+  --pink:#FF3D8B; --yellow:#FFD21F; --cyan:#19D3EE; --lime:#9BEA2B; --orange:#FF7A1A; --violet:#B28BFF; --blue:#2F6BFF;
+  --mint:#3EE8B5; --on:#14123A; --focus:#2F6BFF;
+  --good:#0B7A3B; --bad:#D4145A; --code-bg:#FFEE8C; --code-ink:#14123A;
+  --display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13103A; --surface:#1F1B5A; --ink:#F6F4FF; --muted:#BDB8F2; --line:#3B3790; --edge:#A9A2FF; --dots:#272370;
+    --focus:#19D3EE; --good:#8DF04A; --bad:#FF7AAE; --code-bg:#3A3490; --code-ink:#FFF3A8;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13103A; --surface:#1F1B5A; --ink:#F6F4FF; --muted:#BDB8F2; --line:#3B3790; --edge:#A9A2FF; --dots:#272370;
+  --focus:#19D3EE; --good:#8DF04A; --bad:#FF7AAE; --code-bg:#3A3490; --code-ink:#FFF3A8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background-color:var(--bg);
+  background-image:radial-gradient(var(--dots) 1.3px,transparent 1.3px);
+  background-size:24px 24px;
+  color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.55;
+  padding-block:30px 72px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:740px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2.5rem,10vw,4.6rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+h2{font-size:1.3rem;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+p{margin:0}
+code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);color:var(--code-ink);padding:.08em .38em;border-radius:5px}
+.label{font-family:var(--mono);font-size:.74rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chip{display:inline-block;background:var(--c,var(--cyan));color:var(--on);border:2px solid var(--edge);border-radius:99px;padding:3px 12px;font-weight:700}
+.hl{display:inline-block;background:var(--yellow);color:var(--on);padding:0 .16em;border:3px solid var(--edge);border-radius:12px;box-shadow:4px 4px 0 var(--edge);transform:rotate(-2.5deg)}
+.lede{color:var(--muted);max-width:60ch;margin-top:16px;font-size:1.02rem}
+.small{font-size:.86rem;color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+
+.btn{border:2px solid var(--edge);background:var(--surface);color:var(--ink);padding:10px 18px;border-radius:12px;font-weight:700;font-size:.95rem;box-shadow:3px 3px 0 var(--edge);transition:transform .1s,box-shadow .1s}
+.btn:hover:not([disabled]){transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--edge)}
+.btn:active:not([disabled]){transform:translate(3px,3px);box-shadow:0 0 0 var(--edge)}
+.btn.primary{background:var(--pink);color:var(--on)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn.link{border:0;box-shadow:none;background:none;padding:6px 0;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;font-weight:600;color:var(--ink);transition:none}
+.btn.link:hover{transform:none;box-shadow:none;color:var(--pink)}
+
+/* home */
+.seg{display:inline-flex;margin-top:20px;border:2px solid var(--edge);border-radius:99px;background:var(--surface);box-shadow:3px 3px 0 var(--edge);padding:3px;gap:3px}
+.segbtn{border:0;background:transparent;border-radius:99px;padding:8px 20px;font-weight:800;color:var(--ink)}
+.segbtn:hover:not([aria-pressed="true"]){background:var(--code-bg);color:var(--code-ink)}
+.segbtn[aria-pressed="true"]{background:var(--yellow);color:var(--on)}
+.w{font-family:var(--mono);font-size:.72rem;font-weight:700;background:var(--c,var(--pink));color:var(--on);border:2px solid var(--edge);border-radius:99px;padding:0 8px;margin-left:8px;vertical-align:1px}
+.blue{display:flex;height:36px;border:2px solid var(--edge);border-radius:12px;overflow:hidden;box-shadow:3px 3px 0 var(--edge);margin-top:14px}
+.blue span{display:grid;place-items:center;min-width:0;font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--on);border-right:2px solid var(--edge)}
+.blue span:last-child{border-right:0}
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.stat{flex:1 1 120px;padding:10px 14px;border:2px solid var(--edge);border-radius:14px;box-shadow:3px 3px 0 var(--edge);color:var(--on)}
+.stat:nth-child(1){background:var(--pink)} .stat:nth-child(2){background:var(--cyan)}
+.stat:nth-child(3){background:var(--yellow)} .stat:nth-child(4){background:var(--lime)}
+.stat b{font-family:var(--display);font-size:1.9rem;font-weight:800;display:block;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .small{color:var(--on);font-weight:500}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:38px}
+.sec{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:13px 0;border-bottom:2px dashed var(--line);cursor:pointer}
+.sec input{width:20px;height:20px;accent-color:var(--c,var(--pink));margin:0}
+.sec .name{font-weight:700}
+.sec .name::before{content:"";display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--c,var(--pink));border:2px solid var(--edge);margin-right:8px;vertical-align:-1px}
+.sec .blurb{font-size:.86rem;color:var(--muted)}
+.sec .num{font-family:var(--mono);font-size:.82rem;font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.bar{grid-column:2 / 4;height:9px;background:var(--surface);border:2px solid var(--edge);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c,var(--lime))}
+.controls{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;margin-top:24px}
+.controls select{font:inherit;font-weight:600;background:var(--surface);color:var(--ink);border:2px solid var(--edge);border-radius:10px;padding:8px 10px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:22px}
+.mode{border:2px solid var(--edge);background:var(--c,var(--yellow));color:var(--on);border-radius:18px;padding:16px 16px 14px;text-align:left;display:flex;flex-direction:column;gap:6px;box-shadow:5px 5px 0 var(--edge);transition:transform .12s,box-shadow .12s}
+.mode:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--edge)}
+.mode:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--edge)}
+.mode strong{font-family:var(--display);font-size:1.25rem;font-weight:800;line-height:1.15}
+.mode span{font-size:.88rem;color:var(--on)}
+.mode .go{font-family:var(--mono);font-size:.78rem;font-weight:700;margin-top:6px}
+.err{color:var(--bad);min-height:1.4em;margin-top:12px;font-size:.95rem;font-weight:600}
+.hist{margin:10px 0 0;padding:0;list-style:none}
+.hist li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:2px dashed var(--line);font-size:.92rem}
+.hist .num{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+
+/* quiz */
+.topbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px}
+.topbar .left{display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:0}
+.timer{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;font-size:.95rem;background:var(--yellow);color:var(--on);border:2px solid var(--edge);border-radius:99px;padding:3px 12px}
+.timer.low{background:var(--pink)}
+.prog{height:12px;margin-top:14px;background:var(--surface);border:2px solid var(--edge);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--pink) 0 10px,var(--orange) 10px 20px);transition:width .25s}
+.qcard{margin-top:20px;background:var(--surface);border:2px solid var(--edge);border-radius:20px;padding:22px;box-shadow:6px 6px 0 var(--edge)}
+.qtext{margin-top:14px;font-size:1.35rem;line-height:1.3;font-weight:800}
+pre.code{margin:18px 0 0;padding:14px 16px;background:#14123A;color:#EDEBFF;border:2px solid var(--edge);border-radius:12px;overflow-x:auto;font-family:var(--mono);font-size:.84rem;line-height:1.6}
+pre.code code{background:none;color:inherit;padding:0;font-size:inherit}
+.opts{display:grid;gap:12px;margin-top:22px}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;text-align:left;width:100%;padding:12px 14px;border:2px solid var(--edge);background:var(--surface);border-radius:14px;box-shadow:3px 3px 0 var(--edge);transition:transform .1s,box-shadow .1s,background .1s}
+.opt:hover:not([disabled]){transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--edge)}
+.opt .k{font-family:var(--mono);font-weight:700;font-size:.85rem;width:28px;height:28px;border:2px solid var(--edge);border-radius:8px;display:grid;place-items:center;color:var(--on)}
+.opt:nth-child(1) .k{background:var(--pink)} .opt:nth-child(2) .k{background:var(--cyan)}
+.opt:nth-child(3) .k{background:var(--yellow)} .opt:nth-child(4) .k{background:var(--lime)}
+.opt .t{overflow-wrap:anywhere;padding-top:2px}
+.opt.sel{background:var(--yellow);color:var(--on)}
+.opt.ok{background:var(--lime);color:var(--on)}
+.opt.no{background:var(--pink);color:var(--on)}
+.opt.ok .k,.opt.no .k,.opt.sel .k{background:var(--surface);color:#14123A}
+.opt[disabled]{cursor:default;box-shadow:3px 3px 0 var(--edge)}
+.opt.dim{opacity:.55}
+.fb{margin-top:18px}
+.fb:not(:empty){background:var(--code-bg);color:var(--code-ink);border:2px solid var(--edge);border-radius:14px;padding:12px 14px}
+.fb .verdict{font-weight:800;font-family:var(--display);font-size:1.1rem}
+.fb .verdict.ok{color:var(--good)}
+.fb .verdict.no{color:var(--bad)}
+.fb p{margin-top:6px;max-width:62ch}
+.actions{display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap}
+
+/* results */
+.score{font-family:var(--display);font-weight:800;font-size:clamp(3.6rem,18vw,7rem);letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;color:var(--pink);text-shadow:5px 5px 0 var(--edge);-webkit-text-stroke:2px var(--edge)}
+.brk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:10px 14px;align-items:center;margin-top:12px}
+.brk .bar{grid-column:auto;height:12px}
+.rev{margin-top:12px;border-top:2px dashed var(--line)}
+.rev details{border-bottom:2px dashed var(--line);padding:12px 0}
+.rev summary{cursor:pointer;font-weight:600}
+.rev .body{margin-top:10px}
+.rev .ans{margin-top:8px;font-size:.92rem}
+.rev .ans b{font-weight:700}
+.good{color:var(--good)} .badc{color:var(--bad)}
+
+/* question bank */
+.flag{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--edge);background:var(--surface);color:var(--ink);border-radius:99px;padding:4px 13px 4px 7px;font-size:.84rem;font-weight:600;white-space:nowrap;box-shadow:2px 2px 0 var(--edge)}
+.flag:hover{background:var(--code-bg);color:var(--code-ink)}
+.flag .box{width:18px;height:18px;border:2px solid var(--edge);border-radius:6px;display:grid;place-items:center;font-size:11px;font-weight:800;line-height:1;background:var(--surface);color:var(--on)}
+.flag[aria-pressed="true"]{background:var(--yellow);color:var(--on)}
+.flag[aria-pressed="true"] .box{background:var(--lime)}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.tab{border:2px solid var(--edge);background:var(--surface);color:var(--ink);padding:7px 15px;font-weight:700;border-radius:99px;box-shadow:2px 2px 0 var(--edge)}
+.tab[aria-selected="true"]{background:var(--pink);color:var(--on)}
+.field{display:grid;gap:6px;margin-top:16px}
+.field label,.field .lbl{font-size:.86rem;font-weight:700}
+.field input[type=text],.field input[type=search],.field textarea,.field select{font:inherit;background:var(--surface);color:var(--ink);border:2px solid var(--edge);border-radius:10px;padding:9px 11px;width:100%;min-width:0}
+.field textarea{resize:vertical;min-height:84px}
+.field textarea.mono{font-family:var(--mono);font-size:.84rem}
+.optrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+.optrow input[type=radio]{accent-color:var(--pink);width:20px;height:20px;margin:0}
+.qrow{display:grid;gap:8px;padding:14px 0;border-bottom:2px dashed var(--line)}
+.qrow .qt{overflow-wrap:anywhere}
+.qrow .meta{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.qrow .rowact{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:.7rem;font-weight:700;background:var(--violet);color:var(--on);border:2px solid var(--edge);border-radius:99px;padding:0 8px;margin-left:8px;letter-spacing:.04em;text-transform:uppercase}
+.ok-note{color:var(--good);font-size:.92rem;font-weight:700}
+
+/* group progress */
+.grow{border-bottom:2px dashed var(--line)}
+.grow summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer;list-style:none;padding:13px 0}
+.grow summary::-webkit-details-marker{display:none}
+.grow summary .bar{grid-column:auto;height:12px}
+.grow summary .bar i{background:var(--pink)}
+.grow .num{font-family:var(--mono);font-size:.84rem;font-weight:500;font-variant-numeric:tabular-nums}
+.gname{font-weight:700;overflow-wrap:anywhere}
+.gdet{padding:0 0 16px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--surface);border:2px solid var(--edge);margin-right:8px;vertical-align:-1px}
+.dot.on{background:var(--lime);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--lime)}
+@media (max-width:480px){.qcard{padding:16px;border-radius:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head><body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+"use strict";
+
+var PRO_SECTIONS=[
+  {id:"dev",name:"Developing code",w:23,n:14,blurb:"Python and SQL, Lakeflow Pipelines and Jobs, CDC, stateful streaming, testing"},
+  {id:"ing",name:"Ingestion and acquisition",w:12,n:7,blurb:"Auto Loader, Kafka, Lakeflow Connect CDC, Delta Sharing, Clean Rooms, Federation"},
+  {id:"man",name:"Data manipulation",w:12,n:7,blurb:"Windows, joins, MERGE, VARIANT, AI functions, expectations"},
+  {id:"mon",name:"Monitoring and alerting",w:10,n:6,blurb:"System tables, event logs, Spark UI, alerts, job notifications"},
+  {id:"prf",name:"Cost and performance",w:15,n:9,blurb:"Predictive optimization, liquid clustering, deletion vectors, caching, CDF"},
+  {id:"sec",name:"Security and compliance",w:8,n:5,blurb:"ACLs, ABAC, row filters, column masks, PII, purging"},
+  {id:"gov",name:"Governance",w:5,n:3,blurb:"Unity Catalog inheritance, tags, comments, lineage"},
+  {id:"dbg",name:"Debugging and deploying",w:10,n:6,blurb:"Repairs, Spark UI, Declarative Automation Bundles, Git CI/CD"},
+  {id:"mod",name:"Data modelling",w:5,n:3,blurb:"Dimensional models, metric views, clustering vs partitioning, compaction"}
+
+];
+var ASSOC_SECTIONS=[
+  {id:"a_plat",name:"Databricks Intelligence Platform",w:6,n:3,blurb:"Architecture, Delta Lake, Unity Catalog, choosing compute"},
+  {id:"a_load",name:"Data ingestion and loading",w:21,n:9,blurb:"COPY INTO, Auto Loader, Lakeflow Connect, JDBC and REST, semi-structured data"},
+  {id:"a_xfm",name:"Data transformation and modeling",w:22,n:10,blurb:"Cleaning, joins, deduplication, aggregations, tuning, gold layer"},
+  {id:"a_jobs",name:"Working with Lakeflow Jobs",w:16,n:7,blurb:"Retries, branching and looping, task types, schedules and triggers"},
+  {id:"a_cicd",name:"Implementing CI/CD",w:10,n:5,blurb:"Git folders, bundle variables, deploying bundles, Databricks CLI"},
+  {id:"a_trb",name:"Troubleshooting, monitoring, optimization",w:10,n:4,blurb:"Run history, Spark UI, shuffle and spill, predictive optimization, cluster issues"},
+  {id:"a_gov",name:"Governance and security",w:15,n:7,blurb:"Managed vs external tables, GRANT and REVOKE, masks, row filters, ABAC"}
+];
+var EXAMS={
+  pro:{name:"Databricks Data Engineer Professional",short:"Professional",total:60,minutes:120,
+    guide:"From the official guide dated 9 October 2026: 60 scored questions in 120 minutes.",sections:PRO_SECTIONS},
+  assoc:{name:"Databricks Data Engineer Associate",short:"Associate",total:45,minutes:90,
+    guide:"From the official guide dated 4 May 2026: 45 scored questions in 90 minutes.",sections:ASSOC_SECTIONS}
+};
+var curExam="pro";
+var SECTIONS=PRO_SECTIONS;
+
+/* Each question: s = section, q = text, c = optional code, o = options (FIRST is correct, shuffled at runtime), e = explanation */
+var QUESTIONS=[
+/* ---- developing code ---- */
+{s:"dev",q:"A pipeline applies a change feed to a target table with AUTO CDC (APPLY CHANGES). Events can arrive out of order. Which setting makes sure the latest change per key wins?",
+ o:["SEQUENCE BY a column that increases with every change in the source","ORDER BY the pipeline's processing time","Set KEYS to the sequencing column","Use COLUMNS * EXCEPT on the sequencing column"],
+ e:"SEQUENCE BY (sequence_by in Python) tells the pipeline how to order changes for each key, so late events never overwrite newer ones. KEYS identify the row; they do not order changes."},
+{s:"dev",q:"Which dataset type fits an aggregate over a source table that receives updates and deletes, where the result must stay correct after those changes?",
+ o:["Materialized view","Streaming table","Temporary view","Append flow into a streaming table"],
+ e:"Materialized views are refreshed (incrementally where possible) so results reflect updates and deletes in their sources. Streaming tables process each input row once and expect append-only sources."},
+{s:"dev",q:"Which responsibility do declarative pipelines take over compared with hand-written Structured Streaming jobs?",
+ o:["Resolving dependencies between datasets and managing checkpoints and retries","Choosing the business logic of each transformation","Writing unit tests for each table","Granting Unity Catalog privileges to consumers"],
+ e:"You declare datasets and queries; the pipeline works out execution order, manages checkpoints, handles retries and infrastructure. The transformation logic and tests remain yours."},
+{s:"dev",q:"Why is a pandas (vectorized) UDF usually faster than a row-at-a-time Python UDF?",
+ o:["Data moves in Apache Arrow batches and the function works on whole Series","It runs inside the JVM without Python","It skips serialization entirely","It disables the Catalyst optimizer for the query"],
+ e:"Pandas UDFs transfer data between the JVM and Python in Arrow batches, so Python code handles many values per call. Row-at-a-time UDFs serialize every row individually."},
+{s:"dev",q:"Which PySpark testing helper compares two DataFrames and reports a readable difference when they do not match?",
+ o:["pyspark.testing.assertDataFrameEqual","df1 == df2","assertSchemaEqual","DataFrame.explain()"],
+ e:"assertDataFrameEqual checks schema and rows, with options for row order and approximate float comparison. assertSchemaEqual compares schemas only."},
+{s:"dev",q:"A job task calls an external API that charges per call and cannot be safely repeated. How should you configure the task?",
+ o:["Set retries to 0 and make the logic idempotent where possible","Leave default retries so failures recover automatically","Use serverless compute so retries are free","Schedule the job more often"],
+ e:"Automatic retries re-run the task after a failure. For non-idempotent side effects, disable retries (or make the work idempotent) so a repeat cannot duplicate the effect."},
+{s:"dev",q:"You must run one notebook task for each of 20 country codes, several at a time, from a single task definition. What do you use?",
+ o:["A For each task with a concurrency setting","Twenty copies of the task","A Python loop on the driver in one notebook","A chain of Run job tasks"],
+ e:"The For each task iterates over a list of inputs and runs a nested task per item, with a configurable concurrency, and shows each iteration in the run UI."},
+
+/* ---- ingestion ---- */
+{s:"ing",q:"An Auto Loader stream with no explicit schema meets a file with a new column. With default settings, what happens?",
+ o:["The stream fails, the new column is added to the schema location, and it succeeds on restart","The new column is silently dropped","The column is always written to _rescued_data and the stream continues","Auto Loader rewrites earlier files to add the column"],
+ e:"The default mode is addNewColumns when you do not supply a schema. The stream stops once, records the evolved schema in cloudFiles.schemaLocation, and picks it up on restart. Use rescue mode to route unexpected data to _rescued_data without failing."},
+{s:"ing",q:"Which column holds values that did not match the expected schema when Auto Loader runs with schema evolution mode rescue?",
+ o:["_rescued_data","_corrupt_record","_metadata","_change_type"],
+ e:"Auto Loader adds _rescued_data for mismatched or unexpected fields. _corrupt_record belongs to PERMISSIVE parsing in Spark readers, _metadata carries file details, and _change_type appears in Change Data Feed."},
+{s:"ing",q:"A scheduled job must process all new files in several micro-batches and then stop. Which trigger do you use?",
+ o:["trigger(availableNow=True)","trigger(processingTime='10 seconds')","trigger(continuous='1 second')","No trigger and stop the query after a sleep"],
+ e:"availableNow processes everything available, respecting rate limits such as maxFilesPerTrigger across multiple batches, and then stops. The older once trigger uses a single batch and is deprecated."},
+{s:"ing",q:"The stream below reads from Kafka. What type is the value column, and what must you do to read JSON payloads?",
+ c:"df = (spark.readStream.format(\"kafka\")\n      .option(\"kafka.bootstrap.servers\", servers)\n      .option(\"subscribe\", \"orders\")\n      .load())",
+ o:["Binary; cast it to string and parse it with from_json","String; it already parses JSON","Struct; select fields with dot notation","Map; use explode"],
+ e:"Kafka key and value arrive as binary. Cast value to STRING and apply from_json with a schema to get columns."},
+{s:"ing",q:"You want Auto Loader to infer a schema but force the id column to BIGINT. Which option does this?",
+ o:["cloudFiles.schemaHints = 'id BIGINT'","cloudFiles.inferColumnTypes = false","cloudFiles.format = 'bigint'","cloudFiles.schemaEvolutionMode = 'none'"],
+ e:"schemaHints lets you override the inferred type for specific columns while leaving the rest to inference."},
+{s:"ing",q:"Which property of COPY INTO makes re-running the same statement safe?",
+ o:["It tracks loaded files and skips them, so it is idempotent","It always reloads all files","It requires a checkpoint location","It only supports Delta source files"],
+ e:"COPY INTO keeps track of which files it has already loaded, so repeating the command only loads new files."},
+{s:"ing",q:"An input directory holds millions of files and directory listing has become slow. Which Auto Loader approach helps?",
+ o:["File notification mode (cloudFiles.useNotifications)","Increase maxFilesPerTrigger to 1","Convert files to CSV first","Use trigger(once=True)"],
+ e:"Notification mode learns about new files from cloud event services instead of listing the whole directory, which scales better for very large inputs."},
+
+/* ---- transformation and quality ---- */
+{s:"man",q:"Rows that violate a constraint should be removed and counted in metrics, while the pipeline keeps running. Which expectation behavior fits?",
+ o:["expect_or_drop","expect (retain invalid rows)","expect_or_fail","No expectation; filter in a downstream notebook"],
+ e:"expect_or_drop removes violating rows and records the count in the event log. expect keeps them and only records metrics; expect_or_fail stops the update."},
+{s:"man",q:"The rules below are defined for a pipeline. How do you use them to build a quarantine table?",
+ c:"rules = {\"valid_id\": \"id IS NOT NULL\",\n         \"valid_amount\": \"amount >= 0\"}\nquarantine_rule = \"NOT ({0})\".format(\" AND \".join(rules.values()))",
+ o:["Apply the rules as expectations on the clean table and filter the source with quarantine_rule into a separate table","Pass quarantine_rule to expect_or_fail on the clean table","Drop all rows that match the rules and discard them","Use quarantine_rule as the SEQUENCE BY column"],
+ e:"The standard pattern keeps one rule set: valid rows pass the rules into the clean table, and the negation of the same rules selects the rows to land in a quarantine table for inspection."},
+{s:"man",q:"The query below keeps the latest row per customer. What happens if two rows for a customer have the same updated_at?",
+ c:"SELECT * FROM (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY customer_id ORDER BY updated_at DESC) AS rn\n  FROM customers_raw\n) WHERE rn = 1",
+ o:["One of them is picked nondeterministically; add a tiebreaker to ORDER BY","Both rows are returned","The query raises an error","Neither row is returned"],
+ e:"ROW_NUMBER assigns distinct numbers even for ties, so exactly one row gets rn = 1, but which one is not defined. Add a second ordering column to make it deterministic."},
+{s:"man",q:"You deduplicate a stream on event_id and must keep state bounded. What do you need?",
+ o:["A watermark on event time with dropDuplicatesWithinWatermark (or the event-time column in dropDuplicates)","dropDuplicates() with no watermark","distinct() on the streaming DataFrame","orderBy on the stream before writing"],
+ e:"Without a watermark, deduplication state grows without limit. With one, Spark can discard state for events older than the watermark."},
+{s:"man",q:"What must be defined to run a stream-stream outer join without unbounded state?",
+ o:["Watermarks on both inputs and an event-time range condition in the join","A broadcast hint on one side","foreachBatch on one stream","Complete output mode"],
+ e:"Spark needs watermarks and a time-bound join condition to know when unmatched rows can no longer match, so it can emit outer results and clean up state."},
+{s:"man",q:"A 5 MB dimension table is joined to a 2 TB fact table. Which strategy avoids shuffling the fact table?",
+ o:["Broadcast hash join of the dimension","Sort-merge join","Cartesian product","Repartition the fact table by all columns"],
+ e:"Broadcasting the small side sends a copy to every executor, so the large table is joined in place without a shuffle."},
+{s:"man",q:"Which MERGE clause removes target rows that no longer exist in the source?",
+ o:["WHEN NOT MATCHED BY SOURCE THEN DELETE","WHEN NOT MATCHED THEN DELETE","WHEN MATCHED THEN INSERT","WHEN NOT MATCHED BY TARGET THEN DELETE"],
+ e:"WHEN NOT MATCHED (BY TARGET) handles source rows missing from the target, usually inserts. BY SOURCE handles target rows missing from the source."},
+
+/* ---- sharing and federation ---- */
+{s:"ing",q:"A partner reads shared data from pandas and Power BI and has no Databricks workspace. Which sharing mode applies?",
+ o:["Open sharing (D2O) with a credential file from an activation link","Databricks-to-Databricks sharing","A Lakehouse Federation connection","A pipeline sink to the partner's bucket"],
+ e:"Open sharing uses the Delta Sharing protocol with a bearer-token credential file, so any client that supports the protocol can read. D2D needs a Unity Catalog-enabled Databricks recipient."},
+{s:"ing",q:"For Databricks-to-Databricks sharing, what does the provider need from the recipient?",
+ o:["The recipient's sharing identifier from its Unity Catalog metastore","A personal access token","The recipient's cloud storage keys","The recipient workspace's admin password"],
+ e:"The provider creates a recipient object using the other metastore's sharing identifier. No tokens or storage keys are exchanged."},
+{s:"ing",q:"Which statement about Delta Sharing is true?",
+ o:["Recipients get read-only access to the provider's data without a copy being made by default","Data is replicated to the recipient's storage when the share is created","Recipients receive write access to shared tables","Shares can only contain Parquet files without Delta"],
+ e:"Shared data is read in place through short-lived access. Recipients cannot modify it."},
+{s:"ing",q:"A recipient wants to stream from a shared table and use Change Data Feed. How should the provider add the table?",
+ o:["Add it to the share WITH HISTORY","Add it as a view","Make the recipient a metastore admin","Share the storage path directly"],
+ e:"Sharing with history exposes the table history, which streaming reads and Change Data Feed on the recipient side depend on."},
+{s:"ing",q:"You must query a PostgreSQL database in place and govern access with Unity Catalog. What do you create?",
+ o:["A connection and a foreign catalog","An external location pointing at the database","A streaming table over JDBC","A Delta Sharing recipient"],
+ e:"Lakehouse Federation uses a connection to the external system and a foreign catalog that exposes its objects under Unity Catalog governance."},
+{s:"ing",q:"Which describes tables in a foreign catalog created by Lakehouse Federation?",
+ o:["Read-only tables whose data stays in the external system, governed by Unity Catalog permissions","Delta tables copied into managed storage","Writable tables that sync back automatically","Tables only the metastore admin can query"],
+ e:"Federated queries are pushed to the source system. You get unified governance and lineage without moving the data."},
+
+/* ---- monitoring and alerting ---- */
+{s:"mon",q:"Which system table gives DBU consumption for cost attribution by workspace, SKU and tags?",
+ o:["system.billing.usage","system.access.audit","system.compute.clusters","system.query.history"],
+ e:"system.billing.usage records billable usage with metadata for attribution. system.access.audit holds audit events."},
+{s:"mon",q:"Where can you see how many rows were dropped by expectations in a pipeline update?",
+ o:["The pipeline event log (flow_progress events)","The driver's stdout","The Jobs run output page only","Init script logs"],
+ e:"Data quality metrics are written to the event log, in flow_progress events, and can be queried with SQL."},
+{s:"mon",q:"The team must be notified when a column's null rate goes above 1%. What do you set up?",
+ o:["A scheduled SQL alert on a query that returns the null rate","An expect_or_fail rule on an unrelated table","A Git folder hook","A cluster-scoped init script"],
+ e:"SQL alerts evaluate a query result against a threshold on a schedule and send notifications when the condition is met."},
+{s:"mon",q:"A job normally takes 20 minutes. You want a notification if a run exceeds 40 minutes, without cancelling it. What do you configure?",
+ o:["A duration warning threshold with a notification","A 40 minute timeout","Retries set to 2","Maximum concurrent runs set to 1"],
+ e:"A duration warning only notifies. A timeout would cancel the run."},
+{s:"mon",q:"In the Spark UI, one task in a stage runs far longer than the median and reads much more data. What is the likely cause?",
+ o:["Data skew on the key","Too few executors","A full driver disk","Photon is disabled"],
+ e:"A large gap between the slowest task and the median, together with larger input for that task, points to skewed keys or partitions."},
+{s:"mon",q:"Which signal in a query profile suggests poor file pruning?",
+ o:["A scan reads most files and prunes very few","A high cache hit rate","No spill","A small number of tasks"],
+ e:"The scan node reports files read versus pruned. If almost nothing is pruned, filters are not benefiting from clustering or statistics."},
+
+/* ---- cost and performance ---- */
+{s:"prf",q:"Filter columns change every few months on a large table partitioned by date and Z-ordered by customer. What is the most maintainable change?",
+ o:["Migrate to liquid clustering and change the keys with ALTER TABLE ... CLUSTER BY","Add more partition columns","Run OPTIMIZE ZORDER daily with the new columns","Convert the table to Parquet"],
+ e:"Liquid clustering replaces partitioning and Z-ordering, and clustering keys can be changed without rewriting the whole table up front."},
+{s:"prf",q:"What does enabling deletion vectors change for DELETE, UPDATE and MERGE?",
+ o:["Rows are marked as removed in a side file instead of rewriting whole Parquet files immediately","The Delta transaction log is disabled","Deleted rows are kept in driver memory","Partitioning becomes mandatory"],
+ e:"Deletion vectors defer file rewrites, making row-level changes cheaper. Files are rewritten later, for example by OPTIMIZE or REORG."},
+{s:"prf",q:"Which benefit is specific to Unity Catalog managed tables?",
+ o:["Predictive optimization can run OPTIMIZE, VACUUM and ANALYZE automatically","Dropping the table never touches the data files","They cannot be shared","They disable data skipping"],
+ e:"Predictive optimization works on managed tables, removing the need to schedule maintenance yourself."},
+{s:"prf",q:"A filter column is the 60th column of a very wide Delta table and queries scan every file. What is the likely cause and fix?",
+ o:["Statistics cover the first 32 columns by default; reorder columns or set delta.dataSkippingStatsColumns","Delta cannot filter wide tables","Photon is off","Bloom filters are disabled on managed tables"],
+ e:"Delta collects min and max values for the first 32 columns by default (delta.dataSkippingNumIndexedCols). Without stats on the filter column, files cannot be skipped."},
+{s:"prf",q:"A downstream stream reads a Delta table that receives MERGE updates and fails because the source changed. How do you propagate the updates?",
+ o:["Enable Change Data Feed on the source and read the change feed","Add more partitions","Use trigger(once=True)","Run VACUUM with a retention of zero"],
+ e:"Streaming reads of Delta assume append-only sources. With Change Data Feed you read inserts, updates and deletes as change rows. skipChangeCommits would ignore the changes instead."},
+{s:"prf",q:"A streaming job writes many tiny files in every micro-batch. What reduces them?",
+ o:["Enable optimized writes and auto compaction","Trigger more frequently","Turn off checkpointing","Use coalesce(1000) before writing"],
+ e:"Optimized writes shape output files at write time and auto compaction merges small files after writes."},
+{s:"prf",q:"Which Spark feature coalesces shuffle partitions and handles skewed joins at runtime?",
+ o:["Adaptive Query Execution","Dynamic allocation","Delta clone","Auto Loader"],
+ e:"AQE uses runtime statistics to coalesce small shuffle partitions, switch join strategies and split skewed partitions."},
+
+/* ---- security and compliance ---- */
+{s:"sec",q:"What does this row filter do for a user who is not in the admins group?",
+ c:"CREATE FUNCTION region_filter(region STRING)\nRETURN is_account_group_member('admins') OR region = 'EU';\n\nALTER TABLE sales SET ROW FILTER region_filter ON (region);",
+ o:["Returns only rows where region is 'EU'","Returns all rows","Returns no rows","Fails the query"],
+ e:"For non-admins the first condition is false, so only rows that satisfy region = 'EU' remain. Admins see every row."},
+{s:"sec",q:"Which statement correctly applies a column mask to a table column?",
+ o:["ALTER TABLE t ALTER COLUMN ssn SET MASK mask_ssn","GRANT MASK ON ssn TO analysts","CREATE VIEW v WITH MASK (ssn)","ALTER TABLE t SET COLUMN MASK ssn"],
+ e:"You create a masking function and attach it to the column with ALTER TABLE ... ALTER COLUMN ... SET MASK."},
+{s:"sec",q:"Analysts must join customer records across tables without seeing email addresses, and nobody needs to recover the original value. Which technique fits?",
+ o:["Replace emails with a salted hash or token (pseudonymization)","Delete the email column and the join key","Generalize emails to the domain only","Suppress every row"],
+ e:"A consistent token or salted hash keeps records joinable. Generalizing to a domain would break the join, and deleting the key removes linkage."},
+{s:"sec",q:"After DELETE FROM users WHERE id = 42 on a table with deletion vectors, the old files still contain the row. What guarantees physical removal?",
+ o:["REORG TABLE ... APPLY (PURGE), then VACUUM after the retention period","OPTIMIZE alone","ANALYZE TABLE","Restarting the cluster"],
+ e:"Deletion vectors only mark rows. REORG ... APPLY (PURGE) rewrites files without those rows, and VACUUM removes the old files once past the retention period."},
+{s:"sec",q:"What is the minimum set of privileges for a group to SELECT from main.sales.orders?",
+ o:["USE CATALOG on main, USE SCHEMA on main.sales, SELECT on the table","SELECT on the table only","ALL PRIVILEGES on main","MANAGE on the table"],
+ e:"Reading a table needs access to each container in the path (USE CATALOG, USE SCHEMA) plus SELECT on the table."},
+{s:"sec",q:"Replacing an exact age of 37 with the range 35-39 is an example of which technique?",
+ o:["Generalization","Tokenization","Suppression","Encryption at rest"],
+ e:"Generalization reduces precision so individuals are harder to single out. Suppression removes the value, and tokenization swaps it for a surrogate."},
+
+/* ---- governance ---- */
+{s:"gov",q:"A group is granted SELECT on a schema. What about tables created later in that schema?",
+ o:["The group can read them; privileges inherit to current and future child objects","No access until granted again","Only tables created by the grantor","Only views"],
+ e:"Unity Catalog privileges inherit down the hierarchy to existing and future objects."},
+{s:"gov",q:"How do you mark columns containing PII so they can be found through Catalog Explorer search?",
+ o:["Apply Unity Catalog tags (for example pii = true) and comments","Rename the columns with a pii_ prefix only","Add a cluster tag","Put it in the job name"],
+ e:"Tags and comments are metadata stored in Unity Catalog and are searchable, which helps discovery and governance."},
+{s:"gov",q:"What is the full object name format in Unity Catalog?",
+ o:["catalog.schema.table","metastore.catalog.table","workspace.schema.table","schema.table.column"],
+ e:"Unity Catalog uses a three-level namespace: catalog, schema, then table or view."},
+{s:"gov",q:"What happens to data files when you DROP a managed table versus an external table?",
+ o:["Managed: data is deleted after a retention window; external: files remain","Both delete files immediately","Neither deletes files","External deletes files; managed keeps them"],
+ e:"Unity Catalog owns the lifecycle of managed table data, which is removed after a recoverable window. For external tables only the metadata is dropped."},
+{s:"gov",q:"Which privilege lets a non-owner grant privileges on a table to others?",
+ o:["MANAGE","MODIFY","APPLY TAG","EXECUTE"],
+ e:"MANAGE allows granting and revoking privileges, changing ownership and similar administration without owning the object."},
+{s:"gov",q:"Where can you see which upstream tables and columns feed a table?",
+ o:["Unity Catalog lineage, captured automatically for supported queries","The Spark UI DAG","The cluster event log","The Git history"],
+ e:"Unity Catalog captures table and column lineage across notebooks, jobs and queries on Unity Catalog compute."},
+
+/* ---- debugging and deploying ---- */
+{s:"dbg",q:"A 12-task job failed at task 9. How do you re-run only what is needed?",
+ o:["Repair run, which re-runs failed and downstream tasks (with optional parameter overrides)","Re-run the whole job","Clone the job","Increase retries and wait"],
+ e:"Repair run reuses successful task results and re-runs only the failed tasks and those depending on them."},
+{s:"dbg",q:"Which command creates or updates the jobs and pipelines defined in databricks.yml for a target?",
+ o:["databricks bundle deploy -t <target>","databricks bundle validate","databricks bundle destroy","databricks jobs create"],
+ e:"validate checks the configuration, deploy creates or updates resources in a target, run starts a resource, and destroy removes deployed resources. Declarative Automation Bundles were previously called Databricks Asset Bundles."},
+{s:"dbg",q:"Which flow is the best practice for promoting code to production?",
+ o:["Develop on a branch in a Git folder, merge by pull request, then CI tests and deploys a bundle to prod","Edit notebooks directly in the production workspace folder","Copy notebooks between workspaces manually","Run production jobs from a developer's personal folder"],
+ e:"Version control with review and automated testing and deployment gives repeatable, auditable releases."},
+{s:"dbg",q:"A stage shows large 'Spill (disk)'. What does this suggest?",
+ o:["Partitions are too big for executor memory; increase partitions or memory","The driver is unreachable","Too many small files only","Deletion vectors are disabled"],
+ e:"Spill means data for a task did not fit in memory and was written to disk. Smaller partitions or more memory per task helps."},
+{s:"dbg",q:"A declarative pipeline update fails on one table. Where do you first look for that flow's error?",
+ o:["The pipeline update details and event log","The billing system table","Delta Sharing audit","Unity Catalog lineage"],
+ e:"The pipeline UI and event log record each flow's state and error messages, so you can find the failing dataset and cause."},
+{s:"dbg",q:"How do you deploy the same bundle to dev with a smaller cluster and to prod with production settings?",
+ o:["Define separate targets in databricks.yml with per-target overrides","Duplicate the repository","Edit the YAML by hand before each deploy","Use two Git providers"],
+ e:"Targets (such as dev and prod) can override workspace, mode, variables and resource settings from a single bundle definition."},
+
+/* ---- data modelling ---- */
+{s:"mod",q:"In a star schema, what links a fact table to a dimension?",
+ o:["A key column in the fact table that references the dimension's key","Fact rows nested inside dimension rows","A shared partition column only","A Delta Sharing recipient"],
+ e:"Facts hold foreign keys, often surrogate keys, to dimension tables, plus measures."},
+{s:"mod",q:"A dimension must keep the history of customer address changes. Which approach fits?",
+ o:["SCD Type 2 with validity columns (for example STORED AS SCD TYPE 2, producing __START_AT and __END_AT)","SCD Type 1 overwrite","Truncate and reload","Append rows with no key"],
+ e:"SCD Type 2 adds a new row per change with start and end markers, preserving history."},
+{s:"mod",q:"In a medallion architecture, where do cleansed and conformed records live?",
+ o:["Silver","Bronze","Gold","Landing only"],
+ e:"Bronze holds raw ingested data, silver holds cleaned and conformed data, and gold holds business-level aggregates and marts."},
+{s:"mod",q:"Which column is the worst choice as a partition key on a Delta table?",
+ o:["A high-cardinality user_id","A date column on a multi-terabyte table","A country column with a few values","A region column with a handful of values"],
+ e:"High-cardinality partitioning creates huge numbers of tiny partitions and small files. Liquid clustering handles high-cardinality columns better."},
+{s:"mod",q:"Which Delta feature generates surrogate keys for a dimension table?",
+ o:["A GENERATED ALWAYS AS IDENTITY column","A CHECK constraint","A generated column derived from another column","A table property for Z-order"],
+ e:"Identity columns assign unique values automatically. They are unique but not guaranteed to be consecutive."},
+{s:"mod",q:"Which gold-layer design suits BI dashboards with stable aggregations?",
+ o:["Pre-aggregated tables or materialized views modeled for the report","Raw bronze tables queried directly","A single wide JSON string column","Streaming tables with no schema"],
+ e:"Gold tables are shaped for consumption so dashboards read small, well-modeled data quickly."},
+
+/* ---- added for the 9 Oct 2026 exam guide ---- */
+{s:"dev",q:"A streaming aggregation uses withWatermark('event_time', '10 minutes'). What does the watermark let Spark do?",
+ o:["Drop state for windows more than 10 minutes behind the latest event time, and ignore data later than that","Delay every micro-batch by 10 minutes","Sort records by event time before writing","Keep all window state forever for exact results"],
+ e:"The watermark trails the maximum event time seen by the delay you set. Spark can then finalize windows and clean up their state, and data older than the watermark may be dropped."},
+{s:"dev",q:"Which output mode emits a windowed aggregate only once, after the watermark passes the end of the window?",
+ o:["Append","Complete","Update","Overwrite"],
+ e:"Append mode writes a row only when it is final, so with a watermark each window is emitted once. Update emits rows that changed in the batch, and complete rewrites the whole result table every batch."},
+{s:"dev",q:"You need to MERGE every micro-batch of a stream into a Delta table. Which approach fits?",
+ o:["foreachBatch with a function that runs MERGE on the batch DataFrame","writeStream.format('merge')","foreach with a row-level writer","trigger(processingTime='merge')"],
+ e:"foreachBatch hands each micro-batch to your function as a regular DataFrame, so you can run MERGE or write to several sinks. Use the batch id to keep the logic idempotent."},
+{s:"dev",q:"What happens if you delete a streaming query's checkpoint directory and restart it?",
+ o:["Its recorded progress and state are lost, so it starts again according to the source's starting options","It resumes exactly where it stopped","It reads only new data and keeps old state","It fails permanently until the table is recreated"],
+ e:"The checkpoint holds source offsets and operator state. Without it the query behaves like a new one, which can reprocess data or lose aggregation state."},
+{s:"dev",q:"What does STORED AS SCD TYPE 1 do in an AUTO CDC flow?",
+ o:["Updates target rows in place and keeps only the latest value per key","Adds a new row for each change and keeps history","Appends all events without keys","Deletes rows that have not changed"],
+ e:"SCD Type 1 overwrites the current values, so no history is kept. Type 2 keeps a row per version, with start and end columns."},
+{s:"dev",q:"A job must run a clean-up notebook only when an earlier task reports more than 1000 bad rows. Which task type do you add?",
+ o:["An If/else condition task","A For each task","A Run job task","A second schedule"],
+ e:"If/else condition tasks compare values, such as task values from an upstream task, and route dependent tasks down the true or false branch."},
+{s:"dev",q:"A serverless job fails with a dependency version conflict after installing a PyPI library. What is the most reproducible fix?",
+ o:["Declare pinned dependencies in the job or bundle environment specification","Run %pip install in a random notebook cell after imports","Edit the driver's site-packages by hand","Set a Spark config named pypi.version"],
+ e:"Declaring pinned versions in the environment spec gives every run the same dependencies. Ad hoc installs depend on cell order and on what is already loaded."},
+{s:"dev",q:"Which requirement most strongly favors hand-written Structured Streaming over a declarative pipeline?",
+ o:["Custom per-batch logic that writes to an external system using foreachBatch","Automatic ordering of dependent datasets","Built-in data quality expectations","Managed checkpoints"],
+ e:"Declarative pipelines already give you dependency handling, expectations and checkpoint management. Very custom sink logic is where low-level Structured Streaming control helps."},
+{s:"dev",q:"What is true of a Python UDF registered in Unity Catalog?",
+ o:["It is a governed object: you grant EXECUTE on it and can call it from SQL","It exists only in the session that created it","It must be installed as a cluster library","It can only be called from the notebook that defined it"],
+ e:"Unity Catalog functions are securable objects with privileges such as EXECUTE, so they can be shared and governed like tables."},
+
+{s:"ing",q:"Which approach ingests changes from SQL Server into Delta tables incrementally with a managed connector?",
+ o:["A Lakeflow Connect managed ingestion pipeline","Auto Loader pointed at the database host","COPY INTO with a JDBC URL","A Lakehouse Federation foreign catalog"],
+ e:"Lakeflow Connect provides managed connectors for databases such as SQL Server, MySQL and PostgreSQL that capture changes and keep Delta tables up to date. Federation queries data in place and does not ingest it."},
+{s:"ing",q:"Which feature lets Iceberg clients read a Delta table?",
+ o:["UniForm (Universal Format)","Deletion vectors","Change Data Feed","Z-ordering"],
+ e:"With UniForm, Delta tables also produce Iceberg metadata so Iceberg readers can query them without copying the data."},
+{s:"ing",q:"Two companies want to analyze combined data without either side seeing the other's raw data. Which feature fits?",
+ o:["Clean Rooms","Open sharing with a credential file","Auto Loader","A shared cluster"],
+ e:"Clean Rooms let parties run approved code over combined data in a controlled environment, so raw data is not exposed to the other side."},
+{s:"ing",q:"Why use a Unity Catalog connection for Lakehouse Federation instead of putting credentials in notebooks?",
+ o:["The credentials live in one securable object and access is controlled by Unity Catalog privileges","It makes queries run only on the source's own compute","It copies the data into Delta automatically","It removes the need for a network path to the source"],
+ e:"A connection stores how to reach the external system once, and you grant privileges on it, so users never handle the credentials."},
+{s:"ing",q:"Which Auto Loader format value ingests images or other files as raw bytes?",
+ o:["binaryFile","text","parquet","csv"],
+ e:"The binaryFile format returns the file path, modification time, length and the raw content as binary."},
+
+{s:"man",q:"Which function parses a JSON string into a VARIANT value?",
+ o:["parse_json","from_json","get_json_object","json_tuple"],
+ e:"parse_json returns VARIANT. from_json returns a struct for a schema you provide, and get_json_object and json_tuple return strings."},
+{s:"man",q:"Why store semi-structured data as VARIANT instead of a JSON string column?",
+ o:["It keeps a parsed binary form, so queries avoid re-parsing text and tolerate changing shapes","It forces every record to match one fixed schema","It cannot be queried with SQL","It always takes more storage than strings"],
+ e:"VARIANT stores semi-structured data in an efficient binary encoding with flexible structure, which is usually faster to query than repeatedly parsing JSON text."},
+{s:"man",q:"Which function calls a model serving endpoint from SQL to classify each row?",
+ o:["ai_query","explode","transform","sample"],
+ e:"ai_query sends row values to a model serving endpoint and returns the response, so it can enrich or classify data inside a pipeline."},
+{s:"man",q:"Which SQL declares an expectation that drops rows with a null id in a pipeline?",
+ o:["CONSTRAINT valid_id EXPECT (id IS NOT NULL) ON VIOLATION DROP ROW","CHECK (id IS NOT NULL) ON FAILURE DROP","ASSERT id IS NOT NULL DROP","WHERE id IS NOT NULL EXPECT DROP"],
+ e:"Pipeline expectations use CONSTRAINT ... EXPECT (condition) with an optional ON VIOLATION action: DROP ROW or FAIL UPDATE. With no action, violations are kept and counted."},
+{s:"man",q:"What does this expression compute?",
+ c:"SUM(amount) OVER (\n  PARTITION BY customer_id\n  ORDER BY order_date\n  ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)",
+ o:["A running total of amount per customer in date order","The total amount per customer repeated on every row","The previous row's amount","The count of orders per day"],
+ e:"The frame runs from the first row of the partition to the current row, so each row shows the cumulative sum so far."},
+
+{s:"mon",q:"Which system table schema holds job and pipeline run history for workload analysis?",
+ o:["system.lakeflow","system.billing","system.storage","system.marketplace"],
+ e:"The lakeflow schema contains jobs and pipelines metadata and run timelines. Billing holds usage and cost."},
+{s:"mon",q:"You want a script to find failed job runs from the last day. What do you use?",
+ o:["The Jobs API or Databricks SDK to list runs and filter by result state","The Spark UI of a single cluster","Delta Sharing","Unity Catalog lineage"],
+ e:"The Jobs REST API, CLI and SDK let you list runs and read their state programmatically, which suits custom monitoring."},
+
+{s:"prf",q:"What does Delta (disk) caching speed up?",
+ o:["Repeated reads of the same remote data files, by keeping copies on the workers' local disks","Writes to Delta tables","Shuffles between stages","Collecting results to the driver"],
+ e:"The cache stores copies of remote data files on worker local storage, so repeated reads of hot data avoid cloud storage round trips."},
+{s:"prf",q:"What does CLUSTER BY AUTO do on a Unity Catalog managed table?",
+ o:["Databricks chooses and adjusts the clustering keys based on how the table is queried","It clusters on every column","It disables clustering","It partitions by date"],
+ e:"Automatic liquid clustering picks keys from observed query patterns and can change them over time, working together with predictive optimization."},
+{s:"prf",q:"Which statement about liquid clustering is true?",
+ o:["A table that uses it cannot also be partitioned or Z-ordered","It requires ZORDER BY on every OPTIMIZE","It only works on external tables","Its keys can never be changed"],
+ e:"Liquid clustering replaces partitioning and Z-ordering on a table, and the clustering keys can be changed with ALTER TABLE ... CLUSTER BY."},
+{s:"prf",q:"Which column in Change Data Feed output tells you whether a row is an insert, update or delete?",
+ o:["_change_type","_commit_version","_rescued_data","_metadata"],
+ e:"_change_type holds insert, update_preimage, update_postimage or delete. _commit_version and _commit_timestamp say which commit the change came from."},
+
+{s:"sec",q:"What is the advantage of an attribute-based access control policy over setting a row filter on each table?",
+ o:["One policy applies automatically to every table or column that carries the governed tag","It removes the need for Unity Catalog","It encrypts the data files","It only works on external tables"],
+ e:"ABAC policies refer to governed tags, so adding the tag to a column or table brings it under the policy without editing each table."},
+{s:"sec",q:"A streaming pipeline must mask email addresses before data is stored in silver. Where do you apply the masking?",
+ o:["In the bronze-to-silver transformation, before the data is written","In the dashboard","After the data lands, with a nightly job","In the cluster init script"],
+ e:"Masking in the transformation means unmasked values are never persisted in the silver table, which is the compliant design."},
+
+{s:"mod",q:"What is a Unity Catalog metric view for?",
+ o:["Defining governed measures and dimensions once so every query and dashboard computes them the same way","Storing raw event data","Caching query results on the driver","Replacing foreign keys"],
+ e:"A metric view centralizes business metrics and dimensions, so teams get consistent numbers without repeating the logic."},
+{s:"mod",q:"A table receives frequent small appends and now has many small files. Which command compacts them?",
+ o:["OPTIMIZE","VACUUM","ANALYZE TABLE","REFRESH TABLE"],
+ e:"OPTIMIZE rewrites small files into larger ones. VACUUM removes old files that are no longer referenced."},
+
+/* ---- Databricks Data Engineer Associate (guide of 4 May 2026) ---- */
+{s:"a_plat",q:"What does a Delta Lake table consist of in cloud storage?",
+ o:["Parquet data files plus a transaction log","Only JSON files","A proprietary binary database file","CSV files and a manifest kept in the workspace"],
+ e:"Delta Lake stores data as Parquet files and records every change in a transaction log. The log is what gives tables ACID transactions, time travel and reliable concurrent reads and writes."},
+{s:"a_plat",q:"What does Unity Catalog provide?",
+ o:["Central governance for data and AI assets: access control, lineage and auditing across workspaces","A faster Spark engine","A Git hosting service","Automatic cleaning of bad data"],
+ e:"Unity Catalog is the governance layer. It manages permissions, lineage, audit logs and discovery for tables, volumes, models and functions across workspaces."},
+{s:"a_plat",q:"A scheduled ETL job should start quickly and needs no cluster management. Which compute option fits best?",
+ o:["Serverless compute for jobs","An all-purpose cluster left running all day","A single-node cluster for each analyst","A SQL warehouse running Python notebooks"],
+ e:"Serverless compute starts quickly, scales automatically and has no infrastructure to manage. All-purpose clusters are meant for interactive work, and SQL warehouses run SQL, not Python notebooks."},
+{s:"a_plat",q:"Which compute is built for SQL queries, dashboards and alerts?",
+ o:["A SQL warehouse","A job cluster running Scala","A driver-only cluster","An instance pool"],
+ e:"SQL warehouses are optimized for SQL workloads, including queries, dashboards and alerts, and are the compute behind Databricks SQL."},
+
+{s:"a_load",q:"You run COPY INTO nightly on a landing folder. What happens to files that were loaded the night before?",
+ o:["They are skipped, because COPY INTO tracks which files it has loaded","They are loaded again and duplicated","The command fails","They are deleted from the folder"],
+ e:"COPY INTO is idempotent: it remembers the files it already loaded into the target table and only loads new ones."},
+{s:"a_load",q:"What is the main benefit of Auto Loader over listing a folder yourself?",
+ o:["It efficiently discovers and processes only new files, with checkpointing and schema handling","It converts every file to Delta without a target table","It deletes processed files automatically","It needs no storage location"],
+ e:"Auto Loader tracks which files it has seen in its checkpoint, so each run handles only new files, and it can infer and evolve the schema."},
+{s:"a_load",q:"Which two methods can Auto Loader use to detect new files?",
+ o:["Directory listing and file notification","Polling the driver and broadcasting","Change Data Feed and deletion vectors","COPY INTO and MERGE"],
+ e:"Directory listing scans the input path, and file notification uses cloud event services. Notification scales better for very large directories."},
+{s:"a_load",q:"An Auto Loader stream finds an extra field you did not expect. How can the stream keep running and still capture that data?",
+ o:["Use rescue schema evolution mode so the extra field lands in _rescued_data","Delete the checkpoint","Turn off schema inference","Switch to COPY INTO with FORCE"],
+ e:"In rescue mode the schema stays fixed and data that does not fit is saved in the _rescued_data column, so nothing is lost and the stream does not fail."},
+{s:"a_load",q:"Which pattern runs Auto Loader as an incremental batch job that stops when it has processed everything available?",
+ o:["trigger(availableNow=True)","trigger(processingTime='1 second')","A while loop around spark.read","trigger(continuous='1 second')"],
+ e:"availableNow processes all new data and then stops, which suits scheduled jobs that want streaming bookkeeping without a long-running cluster."},
+{s:"a_load",q:"You need to ingest data from Salesforce with little code and little maintenance. Which option fits best?",
+ o:["A Lakeflow Connect managed connector","A custom REST loop in a notebook","COPY INTO from the Salesforce URL","Auto Loader on the Salesforce website"],
+ e:"Lakeflow Connect has managed connectors for enterprise applications and databases, handling incremental loading for you."},
+{s:"a_load",q:"A source database has no managed connector. How can a notebook read one of its tables?",
+ o:["spark.read.format('jdbc') with the URL, table and credentials from secrets","spark.read.format('delta') with the host name","COPY INTO with the database host","Auto Loader with cloudFiles.format = 'jdbc'"],
+ e:"The JDBC data source reads tables from relational databases. Keep credentials in a secret scope, and orchestrate the notebook with Lakeflow Jobs."},
+{s:"a_load",q:"Where do you call a REST API and land the results in Delta on a schedule?",
+ o:["In a notebook task, orchestrated by Lakeflow Jobs, writing the response to a Delta table","In a SQL alert","In a cluster policy","In a Unity Catalog tag"],
+ e:"A notebook can call REST endpoints with Python, parse the response and write it to a table. A Lakeflow Job schedules and retries it."},
+{s:"a_load",q:"A table has an address struct column with a city field. How do you select the city?",
+ o:["Use dot notation, for example address.city","Convert the column to CSV first","Use split(address, '.')","Nested fields cannot be queried"],
+ e:"Struct fields are accessed with dot notation in SQL and PySpark. Arrays can be flattened with explode."},
+{s:"a_load",q:"Files arrive continuously in cloud storage and their columns change from time to time. Which method suits this best?",
+ o:["Auto Loader with schema evolution","A nightly full overwrite with spark.read","A one-time manual upload","Lakehouse Federation"],
+ e:"Auto Loader is designed for continuous, incremental file ingestion with schema inference and evolution."},
+{s:"a_load",q:"Which object is the natural target for incrementally ingesting files with SQL in a pipeline?",
+ o:["A streaming table","A temporary view","A materialized view","An external location"],
+ e:"Streaming tables process each new input once, which fits incremental ingestion. Materialized views are for results computed from other tables."},
+
+{s:"a_xfm",q:"Bronze data contains rows with a null customer_id that should not reach silver. Which PySpark call removes them?",
+ o:["df.dropna(subset=['customer_id'])","df.dropDuplicates(['customer_id'])","df.distinct()","df.limit(0)"],
+ e:"dropna with a subset removes rows that have nulls in those columns. dropDuplicates removes repeated rows, which is a different job."},
+{s:"a_xfm",q:"Which join keeps every row from the left table and fills in matches from the right where they exist?",
+ o:["LEFT JOIN","INNER JOIN","CROSS JOIN","UNION"],
+ e:"A left join returns all left rows, with nulls for right columns when nothing matches. An inner join keeps only matching rows."},
+{s:"a_xfm",q:"When is a broadcast join most useful?",
+ o:["Joining a large table with a small one","Joining two tables of equal, very large size","Removing duplicates","Writing to Delta"],
+ e:"Broadcasting a small table to all executors avoids shuffling the large table, which usually makes the join much faster."},
+{s:"a_xfm",q:"What is the difference between UNION and UNION ALL in Spark SQL?",
+ o:["UNION removes duplicate rows, UNION ALL keeps them","UNION keeps duplicates, UNION ALL removes them","UNION needs the same number of rows in both tables","There is no difference"],
+ e:"UNION ALL simply appends rows and is cheaper. UNION also removes duplicates, which requires extra work."},
+{s:"a_xfm",q:"A column holds an array with three tags in each row. What does explode produce?",
+ o:["One output row per array element","One row with the array sorted","One column per element","The count of elements"],
+ e:"explode turns each element of an array into its own row, repeating the other columns of the row."},
+{s:"a_xfm",q:"Which PySpark method removes duplicate rows based on a chosen set of columns?",
+ o:["dropDuplicates(['order_id', 'order_date'])","orderBy(['order_id'])","cache()","repartition(2)"],
+ e:"dropDuplicates with a list of columns keeps one row per combination of those columns. Without a list, it compares entire rows."},
+{s:"a_xfm",q:"Which function gives a fast estimate of the number of distinct values on a very large dataset?",
+ o:["approx_count_distinct","count_distinct","collect_set","sum"],
+ e:"approx_count_distinct uses HyperLogLog and trades a small error for much less memory and time than an exact distinct count."},
+{s:"a_xfm",q:"Which Spark setting controls how many partitions a shuffle, such as a join or groupBy, produces?",
+ o:["spark.sql.shuffle.partitions","spark.driver.memory","spark.sql.autoBroadcastJoinThreshold","spark.executor.cores"],
+ e:"spark.sql.shuffle.partitions sets the number of partitions after a shuffle. Too few makes large tasks that may spill, and too many makes tiny tasks."},
+{s:"a_xfm",q:"What does spark.sql.autoBroadcastJoinThreshold control?",
+ o:["The largest table size Spark will broadcast automatically in a join","The number of executors","The shuffle partition count","The driver's memory"],
+ e:"Tables smaller than the threshold are broadcast automatically. Setting it to -1 turns off automatic broadcast joins."},
+{s:"a_xfm",q:"What distinguishes a view from a materialized view?",
+ o:["A view stores only the query, a materialized view stores precomputed results","A view stores results, a materialized view does not","They are identical","A materialized view cannot be queried with SQL"],
+ e:"A view runs its query every time it is read. A materialized view keeps precomputed results and refreshes them, which saves repeated computation."},
+{s:"a_xfm",q:"Where do you declare rules that drop or fail on bad rows in a declarative pipeline?",
+ o:["As expectations on the dataset","In a cluster policy","In a row filter","In the job's retry settings"],
+ e:"Expectations are data quality rules attached to a dataset. They can keep, drop or fail on violating rows and record metrics."},
+{s:"a_xfm",q:"Which medallion layer typically holds business-level aggregates for reporting?",
+ o:["Gold","Bronze","Silver","Landing"],
+ e:"Gold tables are shaped for consumption, such as aggregates and marts. Silver holds cleaned data and bronze holds raw data."},
+
+{s:"a_jobs",q:"A task occasionally fails because of a brief network error. What should you configure on the task?",
+ o:["Retries with a delay between attempts","A longer cluster timeout","A larger driver","A second schedule"],
+ e:"Retries re-run a failed task automatically, which clears transient errors without anyone intervening."},
+{s:"a_jobs",q:"A task should run only when an earlier task reports the value 'full_refresh'. Which job feature do you use?",
+ o:["An If/else condition task","A For each task","A pipeline task","A cluster pool"],
+ e:"If/else condition tasks compare values and send the run down a true or false branch, so dependent tasks run only when the condition holds."},
+{s:"a_jobs",q:"You must run the same task for each value in a list. Which job feature fits?",
+ o:["A For each task","Copying the task many times","A cron expression","A SQL alert"],
+ e:"A For each task loops over inputs and runs a nested task for each, optionally several at a time."},
+{s:"a_jobs",q:"Which job task type runs a query, refreshes a dashboard or runs an alert on a SQL warehouse?",
+ o:["A SQL task","A Python wheel task","A JAR task","A Spark submit task"],
+ e:"SQL tasks run queries, dashboards and alerts on a SQL warehouse as part of a job."},
+{s:"a_jobs",q:"Task B must run after task A succeeds, and task C after both. How do you express this?",
+ o:["Set task dependencies, which form a DAG","Give the tasks the same name","Schedule them at the same time","Put them in one notebook"],
+ e:"Jobs run tasks as a directed acyclic graph. Dependencies decide the order, and independent tasks can run in parallel."},
+{s:"a_jobs",q:"Which trigger starts a job when new files land in a monitored storage location?",
+ o:["A file arrival trigger","A cron schedule","A continuous trigger on the driver","A cluster start trigger"],
+ e:"File arrival triggers watch a Unity Catalog volume or external location and start a run when new files appear."},
+{s:"a_jobs",q:"Which trigger runs a job when an upstream Delta table has changed?",
+ o:["A table update trigger","A file arrival trigger","A manual trigger","A retry trigger"],
+ e:"Table update triggers start a run after the monitored tables are updated, so downstream work follows the data."},
+{s:"a_jobs",q:"Data arrives at unpredictable times. What is usually better than a fixed cron schedule?",
+ o:["A data-driven trigger such as file arrival or table update","A schedule that runs every second","Manual runs only","A bigger cluster"],
+ e:"Data-driven triggers run when there is something to process, avoiding empty runs and waiting. Time-based schedules suit predictable cadences."},
+{s:"a_jobs",q:"How does a job refresh a declarative pipeline as one step of a workflow?",
+ o:["By adding a pipeline task","By calling a REST API from a SQL warehouse","By copying the pipeline code into a notebook","By restarting the cluster"],
+ e:"Pipeline tasks run a pipeline update as a task in a job, so it can have dependencies, retries and notifications like any other task."},
+
+{s:"a_cicd",q:"What can you do from a Git folder in the Databricks workspace UI?",
+ o:["Switch branches, commit, push and pull changes","Only read files","Replace the Git provider","Run Git on your laptop"],
+ e:"Git folders connect a workspace folder to a remote repository, with branch, commit, push and pull operations in the UI. Pull requests are opened at the Git provider."},
+{s:"a_cicd",q:"You need a different catalog name in dev, test and prod from one bundle. What do you use?",
+ o:["Variables with per-target overrides in the bundle configuration","Three copies of the code","Hard-coded names edited by hand","Separate Git providers"],
+ e:"Bundle variables hold values that differ between environments, and each target overrides them, so the same definition deploys everywhere."},
+{s:"a_cicd",q:"Which CLI command checks a bundle's configuration for errors before you deploy?",
+ o:["databricks bundle validate","databricks bundle destroy","databricks bundle run","databricks bundle generate"],
+ e:"validate checks the bundle configuration. deploy creates resources, run starts one, and destroy removes what was deployed."},
+{s:"a_cicd",q:"Which command deploys a bundle's jobs and pipelines to the prod target?",
+ o:["databricks bundle deploy -t prod","databricks bundle validate -t prod","databricks jobs run-now","databricks repos update"],
+ e:"bundle deploy with a target name uploads files and creates or updates the defined resources in that environment."},
+{s:"a_cicd",q:"Why keep notebooks and bundle files in Git?",
+ o:["Version control, review and repeatable automated deployment","It makes queries run faster","It removes the need for testing","It is required to create a cluster"],
+ e:"Git gives history and code review, and CI/CD pipelines can deploy the same reviewed code to each environment."},
+{s:"a_cicd",q:"Which assets can a Declarative Automation Bundle deploy?",
+ o:["Jobs, declarative pipelines and other workspace assets","Only notebooks","Only SQL warehouses","Only Git repositories"],
+ e:"Bundles describe resources such as jobs and pipelines as code, so they can be deployed and managed together."},
+
+{s:"a_trb",q:"A job's runtime has crept up over several weeks. Where do you look first?",
+ o:["The job's run history, comparing recent durations with earlier runs","The Unity Catalog audit log","The Git history","A new cluster policy"],
+ e:"Run history shows duration trends and failures per run, which helps you spot when performance changed."},
+{s:"a_trb",q:"Which view shows task dependencies and which task failed in a job run?",
+ o:["The run's task graph (DAG) in the Jobs UI","The Catalog Explorer lineage tab","The Spark UI storage tab","The SQL editor history"],
+ e:"The job run page shows the task graph with each task's status, run time and error, which is the fastest way to find a failing step."},
+{s:"a_trb",q:"Which Spark UI metric shows that tasks did not fit in memory and wrote data to disk?",
+ o:["Spill (disk)","Shuffle read","Input size","GC time of the driver"],
+ e:"Spill appears when a task's data does not fit in memory. Using smaller partitions or more memory per task reduces it."},
+{s:"a_trb",q:"What is a shuffle in Spark?",
+ o:["Moving data between executors across the network, typically for joins and groupBy","Sorting a file on disk","Copying a table to another catalog","Restarting the driver"],
+ e:"Wide operations such as joins and aggregations need rows with the same key on the same executor, so data is redistributed. Shuffles are costly, so reducing them speeds jobs up."},
+{s:"a_trb",q:"What does predictive optimization do for Unity Catalog managed tables?",
+ o:["Runs maintenance such as OPTIMIZE and VACUUM automatically when it helps","Predicts which users will query a table","Rewrites your notebooks","Encrypts all columns"],
+ e:"Predictive optimization decides when to run table maintenance, so you do not have to schedule it yourself."},
+{s:"a_trb",q:"A cluster fails to start after a library was added that conflicts with the runtime. What is the likely fix?",
+ o:["Remove the library or pin a compatible version","Increase the number of shuffle partitions","Add more executors","Disable Unity Catalog"],
+ e:"Library version conflicts are a common cause of startup failures. The cluster's event log and library status show which one failed."},
+
+{s:"a_gov",q:"Which statement about managed tables in Unity Catalog is correct?",
+ o:["Unity Catalog manages the data files and their lifecycle, so dropping the table removes the data","The data always stays in a path you choose after the table is dropped","They cannot be queried with SQL","They can only be read by the owner"],
+ e:"For managed tables Unity Catalog owns the storage location. Dropping the table eventually deletes its data files."},
+{s:"a_gov",q:"You want table files to stay in your own cloud location even after DROP TABLE. Which table type do you create?",
+ o:["An external table","A managed table","A temporary view","A streaming table"],
+ e:"External tables reference data stored at a location you control. Dropping them removes only the metadata."},
+{s:"a_gov",q:"Which statement converts an external Unity Catalog table to a managed table?",
+ o:["ALTER TABLE t SET MANAGED","ALTER TABLE t SET TBLPROPERTIES ('managed' = 'true')","CONVERT TO DELTA t","DROP EXTERNAL t"],
+ e:"ALTER TABLE ... SET MANAGED converts an external table so Unity Catalog manages its storage. CONVERT TO DELTA changes Parquet files into a Delta table, which is a different job."},
+{s:"a_gov",q:"Which statement lets the group analysts read a table?",
+ o:["GRANT SELECT ON TABLE main.sales.orders TO analysts","GRANT ALL TABLES TO analysts","ALLOW analysts READ orders","SET OWNER orders analysts"],
+ e:"GRANT SELECT gives read access. The group also needs USE CATALOG on the catalog and USE SCHEMA on the schema to reach the table."},
+{s:"a_gov",q:"Which statement removes a privilege that was granted earlier?",
+ o:["REVOKE","DROP","UNSET","DENYALL"],
+ e:"REVOKE removes a previously granted privilege from a user, group or service principal."},
+{s:"a_gov",q:"What does DENY do?",
+ o:["Explicitly blocks a privilege, even if it would otherwise be granted or inherited","Deletes a user","Hides a table from lineage","Pauses a job"],
+ e:"DENY takes precedence over grants, so it is useful for blocking access that would otherwise come through a group or inheritance."},
+{s:"a_gov",q:"Which principal should run production jobs rather than a person's own account?",
+ o:["A service principal","The workspace admin","A shared personal account","The cluster driver"],
+ e:"Service principals are identities for automation. They avoid breaking jobs when a person leaves and make access easier to audit and limit."},
+{s:"a_gov",q:"Which feature hides most digits of a card number for non-finance users while keeping the column queryable?",
+ o:["A column mask","A row filter","A cluster policy","A table comment"],
+ e:"A column mask applies a function to a column's values depending on who is querying, while row filters hide whole rows."},
+{s:"a_gov",q:"What does an ABAC policy use to decide which rows or columns to protect?",
+ o:["Governed tags applied to tables and columns","The name of the cluster","The size of the table","The query's run time"],
+ e:"Attribute-based policies match governed tags, so one policy covers every table or column carrying the tag."},
+{s:"a_gov",q:"A team must read every table in one schema. At which level should you grant SELECT?",
+ o:["On the schema, so it inherits to its tables","On each table separately","On the metastore only","On the cluster"],
+ e:"Privileges inherit down the hierarchy, so granting on the schema covers its existing and future tables. Grant at the lowest level that still meets the need."}
+
+];
+
+function hid(s){var h=5381;for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return "q"+(h>>>0).toString(36)}
+QUESTIONS.forEach(function(q){q.id=hid(q.q)});
+var SEC={};
+var SECMAP={shr:"ing",trn:"man"};
+var PAL=["--pink","--cyan","--yellow","--lime","--orange","--violet","--mint","--pink","--cyan"];
+PRO_SECTIONS.forEach(function(s,i){SEC[s.id]=s;s.c="var("+PAL[i]+")"});
+ASSOC_SECTIONS.forEach(function(s,i){SEC[s.id]=s;s.c="var("+PAL[i]+")"});
+
+/* ---------- storage (per-viewer convenience; the page works without it) ---------- */
+var KEY="lakehouse-pro-quiz-v1";
+function load(){try{var v=JSON.parse(localStorage.getItem(KEY));return v&&typeof v==="object"?v:{}}catch(e){return {}}}
+var store=load();
+function norm(){store.stats=store.stats||{};store.history=store.history||[];store.custom=Array.isArray(store.custom)?store.custom:[];store.exam=store.exam||{};store.custom.forEach(function(c){if(c&&SECMAP[c.s])c.s=SECMAP[c.s]})}
+norm();
+function inExam(q){for(var i=0;i<SECTIONS.length;i++){if(SECTIONS[i].id===q.s)return true}return false}
+function all(){return QUESTIONS.concat(store.custom.filter(function(q){return SEC[q.s]&&q.q&&Array.isArray(q.o)&&q.o.length>=2})).filter(inExam)}
+function builtinCount(){return QUESTIONS.filter(inExam).length}
+function setExam(w){curExam=w==="assoc"?"assoc":"pro";SECTIONS=EXAMS[curExam].sections;formSec=SECTIONS[0].id;bankSec=""}
+function switchExam(w){if(w===curExam)return;store.which=w;save();setExam(w);home()}
+
+setExam(store.which);
+
+/* Per-user cloud copy (db capability, private subtree). Local storage stays the first source so the page works without it. */
+var dbDoc=null,progRef=null,progCol=null,userNs=null,unsubGroup=null,roomNs=null,onlineIds={},lastDocs=null,shareState="off",syncState="local",writing=false,pending=false,saveTimer=null;
+function setNote(){
+  var e=document.getElementById("syncnote");if(!e)return;
+  e.textContent=syncState==="cloud"?"Progress and your own questions are saved to your Claude account and this browser. ":
+    syncState==="error"?"Could not reach your account just now; saved in this browser only. ":
+    "Progress is saved in this browser only. ";
+}
+function save(){
+  store.updated=Date.now();
+  try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}
+  if(dbDoc){pending=true;if(!saveTimer)saveTimer=setTimeout(flush,800)}
+}
+function examSummary(sections){
+  var ids={},sec={},seen=0,ok=0,total=0;
+  sections.forEach(function(s){ids[s.id]=1;sec[s.id]={t:0,n:0,ok:0}});
+  QUESTIONS.forEach(function(q){
+    if(!ids[q.s])return;
+    var st=store.stats[q.id],b=sec[q.s];b.t++;total++;
+    if(st){b.n++;seen++;if(st.ok){b.ok++;ok++}}
+  });
+  return {total:total,seen:seen,ok:ok,sec:sec};
+}
+function summary(){
+  var p=examSummary(PRO_SECTIONS),a=examSummary(ASSOC_SECTIONS);
+  return {total:p.total,seen:p.seen,ok:p.ok,sec:p.sec,rounds:store.rounds||0,
+    mockBest:typeof store.mockBest==="number"?store.mockBest:-1,active:store.updated||Date.now(),
+    logins:store.logins||0,lastLogin:store.lastLogin||0,firstSeen:store.firstSeen||0,
+    assoc:{total:a.total,seen:a.seen,ok:a.ok,sec:a.sec,mockBest:typeof store.mockBestA==="number"?store.mockBestA:-1}};
+}
+function flush(){
+  saveTimer=null;
+  if(!dbDoc||!pending)return;
+  if(writing){saveTimer=setTimeout(flush,500);return}
+  pending=false;writing=true;
+  store.updated=store.updated||Date.now();
+  dbDoc.set({json:JSON.stringify(store),updated:store.updated})
+    .then(function(){
+      syncState="cloud";setNote();
+      if(progRef&&shareState!=="denied"){
+        return progRef.set(summary()).then(function(){shareState="on"}).catch(function(){shareState="denied"});
+      }
+    })
+    .catch(function(){syncState="error";setNote()})
+    .then(function(){writing=false});
+}
+function hasContent(){return Object.keys(store.stats).length||store.history.length||store.custom.length||Object.keys(store.exam).length}
+function connect(){
+  if(!(window.claude&&window.claude.use))return;
+  Promise.all([window.claude.use("db"),window.claude.use("user"),window.claude.use("room")]).then(function(r){
+    var db=r[0],user=r[1],room=r[2];
+    var idp=user?user.id():Promise.resolve(null);
+    return idp.then(function(id){
+      if(!id)return;
+      /* who is here right now */
+      if(room){
+        roomNs=room;
+        room.presence({uid:id}).catch(function(){});
+        room.onPeers(function(ch){
+          var m={};
+          ch.peers.forEach(function(p){
+            if(p.kind==="viewer"){var u=p.by||(p.presence&&p.presence.uid);if(u)m[u]=true}
+          });
+          onlineIds=m;
+          if(view==="group"&&lastDocs)renderGroup(lastDocs);
+        },function(){});
+      }
+      if(!db)return;
+      userNs=user;progCol=db.collection("progress");progRef=progCol.doc(id);
+      dbDoc=db.doc("data/users/"+id+"/state");
+      return dbDoc.get().then(function(snap){
+        var d=snap.exists?snap.data():null;
+        if(d&&typeof d.json==="string"&&(d.updated||0)>(store.updated||0)){
+          try{
+            store=JSON.parse(d.json);norm();setExam(store.which);
+            try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}
+            if(view==="home")home();else if(view==="bank")bank();
+          }catch(e){}
+        }
+        /* record this sign-in; save() also publishes the shared summary */
+        store.logins=(store.logins||0)+1;
+        store.lastLogin=Date.now();
+        if(!store.firstSeen)store.firstSeen=store.lastLogin;
+        save();
+        syncState="cloud";setNote();
+        if(view==="group")group();
+      });
+    });
+  }).catch(function(){});
+}
+
+/* ---------- helpers ---------- */
+var app=document.getElementById("app");
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function fmt(s){return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>")}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function clock(sec){sec=Math.max(0,sec);var h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+  return (h?h+":":"")+String(m).padStart(h?2:1,"0")+":"+String(s).padStart(2,"0")}
+function pct(a,b){return b?Math.round(100*a/b):0}
+var LETTERS=["A","B","C","D"];
+
+var view="home",ses=null,timer=null,selected=null;
+function stopTimer(){if(timer){clearInterval(timer);timer=null}if(unsubGroup){unsubGroup();unsubGroup=null}}
+
+function record(q,ok){
+  var s=store.stats[q.id]||{n:0,ok:false};
+  s.n+=1;s.ok=ok;store.stats[q.id]=s;
+}
+
+/* ---------- home ---------- */
+function home(){
+  stopTimer();view="home";ses=null;
+  var Q=all(),total=Q.length,seen=0,good=0,flagged=0;
+  Q.forEach(function(q){var s=store.stats[q.id];if(s){seen++;if(s.ok)good++}if(store.exam[q.id])flagged++});
+  var missed=Q.filter(function(q){var s=store.stats[q.id];return s&&!s.ok}).length;
+  var mine=store.custom.length;
+
+  var rows=SECTIONS.map(function(sc){
+    var qs=Q.filter(function(q){return q.s===sc.id});
+    var ok=qs.filter(function(q){var s=store.stats[q.id];return s&&s.ok}).length;
+    return '<label class="sec" style="--c:'+sc.c+'"><input type="checkbox" class="secbox" value="'+sc.id+'" checked>'+
+      '<span><span class="name">'+esc(sc.name)+'</span><span class="w">'+sc.w+'%</span><br><span class="blurb">'+esc(sc.blurb)+'</span></span>'+
+      '<span class="num">'+ok+'/'+qs.length+'</span>'+
+      '<span class="bar" aria-hidden="true"><i style="width:'+pct(ok,qs.length)+'%"></i></span></label>';
+  }).join("");
+
+  var hist=store.history.filter(function(h){return (h.x||"pro")===curExam}).slice(-5).reverse().map(function(h){
+    var d=new Date(h.t);
+    return '<li><span>'+esc(d.toLocaleDateString(undefined,{day:"numeric",month:"short"}))+' &middot; '+esc(h.mode)+'</span><span class="num">'+h.right+'/'+h.total+' ('+pct(h.right,h.total)+'%)</span></li>';
+  }).join("");
+
+  var E=EXAMS[curExam];
+  var examN=Math.min(E.total,total);
+  var bp='<div class="blue" role="img" aria-label="Section weights">'+SECTIONS.map(function(sc){
+    return '<span style="flex:'+sc.w+';background:'+sc.c+'" title="'+esc(sc.name)+' '+sc.w+'%">'+(sc.w>=8?sc.w:'')+'</span>';
+  }).join("")+'</div>';
+  app.innerHTML=
+    '<p class="label chip" style="--c:var(--cyan);color:var(--on)">'+esc(E.name)+'</p>'+
+    '<h1 style="margin-top:16px">Lakehouse <span class="hl">Pro</span> Quiz</h1>'+
+    '<div class="seg" role="group" aria-label="Choose the exam"><button type="button" class="segbtn" data-exam="pro" aria-pressed="'+(curExam==="pro")+'">Professional</button><button type="button" class="segbtn" data-exam="assoc" aria-pressed="'+(curExam==="assoc")+'">Associate</button></div>'+
+    '<p class="lede">Practice questions grouped by the sections of the official exam guide, with the real weightings. The built-in questions are original and written for study, not real exam items. Add your own from the question bank.</p>'+
+    '<div class="stats">'+
+      '<div class="stat"><b>'+total+'</b><span class="small">questions</span></div>'+
+      '<div class="stat"><b>'+good+'</b><span class="small">correct on last try</span></div>'+
+      '<div class="stat"><b>'+missed+'</b><span class="small">to revisit</span></div>'+
+      '<div class="stat"><b>'+flagged+'</b><span class="small">seen in exam</span></div>'+
+    '</div>'+
+    '<h2 style="margin-top:36px">Exam blueprint</h2><p class="small" style="margin-top:4px">'+esc(E.guide)+' Bar widths show the weight of each section.</p>'+bp+
+    '<div class="sec-head" style="margin-top:30px"><h2>Sections</h2><span><button class="btn link" id="all" type="button">All</button> &nbsp; <button class="btn link" id="none" type="button">None</button></span></div>'+
+    '<div id="secs" style="margin-top:6px;border-top:1px solid var(--line)">'+rows+'</div>'+
+    '<div class="controls"><label class="small" for="count">Questions per practice round</label>'+
+      '<select id="count"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="0">All in selection</option></select></div>'+
+    '<div class="modes">'+
+      '<button class="mode" style="--c:var(--pink)" id="m-practice" type="button"><strong>Practice</strong><span>Selected sections. Explanation after every answer.</span><span class="go">START &rarr;</span></button>'+
+      '<button class="mode" style="--c:var(--yellow)" id="m-exam" type="button"><strong>Mock exam</strong><span>'+examN+' questions weighted like the real exam, '+Math.round(examN*E.minutes/E.total)+' minutes, answers revealed at the end.</span><span class="go">START &rarr;</span></button>'+
+      '<button class="mode" style="--c:var(--cyan)" id="m-missed" type="button"><strong>Revisit missed</strong><span>'+missed+' question'+(missed===1?'':'s')+' you got wrong last time, within selected sections.</span><span class="go">START &rarr;</span></button>'+
+      '<button class="mode" style="--c:var(--lime)" id="m-repeat" type="button"><strong>Exam repeats</strong><span>'+flagged+' question'+(flagged===1?'':'s')+' you marked as seen in the real exam.</span><span class="go">START &rarr;</span></button>'+
+      '<button class="mode" style="--c:var(--orange)" id="m-bank" type="button"><strong>Question bank</strong><span>Add your own questions ('+mine+' so far), search all '+total+', mark exam repeats.</span><span class="go">OPEN &rarr;</span></button>'+
+    '</div>'+
+    '<p class="err" id="err" role="alert"></p>'+
+    (hist?'<h2 style="margin-top:28px">Recent rounds</h2><ul class="hist">'+hist+'</ul>':'')+
+    '<p class="small" style="margin-top:32px"><span id="syncnote"></span>'+
+      (seen?'<button class="btn link" id="reset" type="button">Reset progress</button>':'')+'</p>';
+
+  setNote();
+  Array.prototype.forEach.call(document.querySelectorAll(".segbtn"),function(b){b.onclick=function(){switchExam(b.getAttribute("data-exam"))}});
+  document.getElementById("all").onclick=function(){setAll(true)};
+  document.getElementById("none").onclick=function(){setAll(false)};
+  document.getElementById("m-practice").onclick=function(){startPractice("all")};
+  document.getElementById("m-missed").onclick=function(){startPractice("missed")};
+  document.getElementById("m-repeat").onclick=function(){startPractice("repeat")};
+  document.getElementById("m-exam").onclick=startExam;
+  document.getElementById("m-bank").onclick=function(){bankTab="browse";editing=null;bank()};
+  
+  var r=document.getElementById("reset");
+  if(r){var armed=false;r.onclick=function(){
+    if(!armed){armed=true;r.textContent="Click again to erase quiz progress (your questions and exam marks stay)";return}
+    store.stats={};store.history=[];save();home();
+  }}
+}
+function setAll(v){Array.prototype.forEach.call(document.querySelectorAll(".secbox"),function(b){b.checked=v})}
+function chosen(){return Array.prototype.filter.call(document.querySelectorAll(".secbox"),function(b){return b.checked}).map(function(b){return b.value})}
+function setErr(m){var e=document.getElementById("err");if(e)e.textContent=m}
+
+/* ---------- sessions ---------- */
+function mkItem(q){
+  var opts=shuffle(q.o.map(function(t,i){return {t:t,ok:i===0}}));
+  return {q:q,opts:opts,pick:null,done:false};
+}
+function begin(mode,qs,limit){
+  ses={mode:mode,items:qs.map(mkItem),i:0,limit:limit||0,t0:Date.now(),quit:false,remaining:limit||0};
+  view="quiz";selected=null;stopTimer();
+  if(ses.limit){timer=setInterval(function(){
+    ses.remaining=ses.limit-Math.floor((Date.now()-ses.t0)/1000);
+    var el=document.getElementById("timer");
+    if(el){el.textContent=clock(ses.remaining);el.classList.toggle("low",ses.remaining<=300)}
+    if(ses.remaining<=0)finish();
+  },1000)}
+  quiz();
+}
+function startPractice(kind){
+  var ids=chosen();
+  if(!ids.length){setErr("Select at least one section.");return}
+  var pool=all().filter(function(q){
+    if(ids.indexOf(q.s)<0)return false;
+    if(kind==="repeat")return !!store.exam[q.id];
+    if(kind==="missed"){var s=store.stats[q.id];return s&&!s.ok}
+    return true;
+  });
+  if(!pool.length){
+    setErr(kind==="missed"?"Nothing to revisit in these sections yet. Answer some questions first.":
+           kind==="repeat"?"No questions marked as seen in your exam in these sections. Tick the exam box on a question to mark it.":
+           "No questions in this selection.");
+    return;
+  }
+  var n=parseInt(document.getElementById("count").value,10);
+  pool=shuffle(pool);if(n>0)pool=pool.slice(0,n);
+  begin(kind==="missed"?"Revisit":kind==="repeat"?"Exam repeats":"Practice",pool,0);
+}
+function startExam(){
+  var E=EXAMS[curExam],Q=all(),pick=[],rest=[];
+  SECTIONS.forEach(function(sc){
+    var pool=shuffle(Q.filter(function(q){return q.s===sc.id}));
+    pick=pick.concat(pool.slice(0,sc.n));rest=rest.concat(pool.slice(sc.n));
+  });
+  var need=E.total-pick.length;
+  if(need>0)pick=pick.concat(shuffle(rest).slice(0,need));
+  begin("Mock exam",shuffle(pick),Math.round(pick.length*E.minutes*60/E.total));
+}
+
+/* ---------- quiz view ---------- */
+function quiz(){
+  var it=ses.items[ses.i],n=ses.items.length,exam=ses.mode==="Mock exam";
+  var answered=it.pick!==null;
+  var optsHtml=it.opts.map(function(o,i){
+    var cls="opt";
+    if(exam){if(it.pick===i)cls+=" sel"}
+    else if(it.done){
+      if(o.ok)cls+=" ok";else if(it.pick===i)cls+=" no";else cls+=" dim";
+    }
+    return '<button type="button" class="'+cls+'" data-i="'+i+'"'+((!exam&&it.done)?' disabled':'')+'><span class="k">'+LETTERS[i]+'</span><span class="t">'+fmt(o.t)+'</span></button>';
+  }).join("");
+
+  var fb="";
+  if(!exam&&it.done){
+    var good=it.opts[it.pick].ok;
+    fb='<div class="verdict '+(good?'ok':'no')+'">'+(good?'Correct.':'Not quite.')+'</div>'+(it.q.e?'<p>'+fmt(it.q.e)+'</p>':'');
+  }
+  var last=ses.i===n-1;
+  var nextLabel=last?"Finish":"Next";
+  var canNext=exam?answered:it.done;
+
+  app.innerHTML=
+    '<div class="topbar"><div class="left"><span class="label">'+esc(ses.mode)+'</span><span class="label">Question '+(ses.i+1)+' / '+n+'</span></div>'+
+    '<div class="left">'+(ses.limit?'<span class="timer'+(ses.remaining<=300&&ses.remaining>0?' low':'')+'" id="timer">'+clock(ses.limit-Math.floor((Date.now()-ses.t0)/1000))+'</span>':'')+
+    '<button class="btn link" id="quit" type="button">'+(ses.quit?'Click again to end now':'End round')+'</button></div></div>'+
+    '<div class="prog"><i style="width:'+Math.round(100*(ses.i+(canNext?1:0))/n)+'%"></i></div>'+
+    '<section class="qcard"><div class="cardhead"><p class="label chip" style="--c:'+SEC[it.q.s].c+'">'+esc(SEC[it.q.s].name)+(it.q.custom?'<span class="tag">yours</span>':'')+'</p>'+
+    '<button type="button" class="flag" id="flag" aria-pressed="'+(!!store.exam[it.q.id])+'"><span class="box">'+(store.exam[it.q.id]?"\u2713":"")+'</span>Came up in my exam</button></div>'+
+    '<h2 class="qtext">'+fmt(it.q.q)+'</h2>'+
+    (it.q.c?'<pre class="code"><code>'+esc(it.q.c)+'</code></pre>':'')+
+    '<div class="opts" role="group" aria-label="Answer options">'+optsHtml+'</div>'+
+    '<div class="fb" aria-live="polite">'+fb+'</div>'+
+    '<div class="actions"><button class="btn primary" id="next" type="button"'+(canNext?'':' disabled')+'>'+nextLabel+'</button>'+
+    '<span class="small">Keys: A-D to answer, N for next</span></div></section>';
+
+  Array.prototype.forEach.call(app.querySelectorAll(".opt"),function(b){
+    b.onclick=function(){choose(parseInt(b.getAttribute("data-i"),10))};
+  });
+  document.getElementById("next").onclick=next;
+  document.getElementById("flag").onclick=function(){toggleFlag(it.q.id);quiz()};
+  document.getElementById("quit").onclick=function(){
+    if(!ses.quit){ses.quit=true;quiz();return}
+    finish();
+  };
+}
+function choose(i){
+  var it=ses.items[ses.i],exam=ses.mode==="Mock exam";
+  if(!exam&&it.done)return;
+  it.pick=i;
+  if(!exam){it.done=true;record(it.q,it.opts[i].ok);save()}
+  ses.quit=false;
+  quiz();
+}
+function next(){
+  var exam=ses.mode==="Mock exam",it=ses.items[ses.i];
+  if(exam?it.pick===null:!it.done)return;
+  if(ses.i>=ses.items.length-1){finish();return}
+  ses.i+=1;ses.quit=false;quiz();
+  window.scrollTo(0,0);
+}
+document.addEventListener("keydown",function(e){
+  if(view!=="quiz"||!ses||e.metaKey||e.ctrlKey||e.altKey)return;
+  var k=e.key.toLowerCase(),idx=["a","b","c","d","1","2","3","4"].indexOf(k);
+  if(idx>=0){var i=idx%4;if(i<ses.items[ses.i].opts.length)choose(i);return}
+  if(k==="n"||k==="arrowright")next();
+});
+
+/* ---------- results ---------- */
+function finish(){
+  stopTimer();
+  var exam=ses.mode==="Mock exam";
+  var items=ses.items;
+  if(exam)items.forEach(function(it){if(it.pick!==null){record(it.q,it.opts[it.pick].ok)}});
+  var answered=items.filter(function(it){return it.pick!==null});
+  var scope=exam?items:answered;
+  if(!scope.length){home();return}
+  var right=scope.filter(function(it){return it.pick!==null&&it.opts[it.pick].ok}).length;
+  store.history.push({t:Date.now(),mode:ses.mode,right:right,total:scope.length,x:curExam});
+  store.rounds=(store.rounds||0)+1;
+  if(exam){var mp=pct(right,scope.length),mk=curExam==="assoc"?"mockBestA":"mockBest";if(!(store[mk]>=mp))store[mk]=mp}
+  store.history=store.history.slice(-30);
+  save();
+  view="result";
+
+  var by={};
+  scope.forEach(function(it){
+    var b=by[it.q.s]||(by[it.q.s]={r:0,t:0});
+    b.t++;if(it.pick!==null&&it.opts[it.pick].ok)b.r++;
+  });
+  var brk=SECTIONS.filter(function(s){return by[s.id]}).map(function(s){
+    var b=by[s.id];
+    return '<span>'+esc(s.name)+'</span><span class="bar" aria-hidden="true"><i style="width:'+pct(b.r,b.t)+'%;background:'+s.c+'"></i></span><span class="num small">'+b.r+'/'+b.t+'</span>';
+  }).join("");
+
+  var wrong=scope.filter(function(it){return it.pick===null||!it.opts[it.pick].ok});
+  var rev=wrong.map(function(it){
+    var correct=it.opts.filter(function(o){return o.ok})[0];
+    return '<details><summary>'+fmt(it.q.q)+'</summary><div class="body">'+
+      (it.q.c?'<pre class="code"><code>'+esc(it.q.c)+'</code></pre>':'')+
+      '<p class="ans"><b class="badc">Your answer:</b> '+(it.pick===null?'not answered':fmt(it.opts[it.pick].t))+'</p>'+
+      '<p class="ans"><b class="good">Correct answer:</b> '+fmt(correct.t)+'</p>'+
+      '<p class="ans">'+fmt(it.q.e)+'</p></div></details>';
+  }).join("");
+
+  var secs=Math.floor((Date.now()-ses.t0)/1000);
+  app.innerHTML=
+    '<p class="label">'+esc(ses.mode)+' &middot; '+clock(secs)+'</p>'+
+    '<div class="score" style="margin-top:10px">'+pct(right,scope.length)+'%</div>'+
+    '<p class="lede" style="margin-top:8px">'+right+' of '+scope.length+' correct.'+(wrong.length?' Review the '+wrong.length+' you missed below.':' Clean sweep.')+'</p>'+
+    '<h2 style="margin-top:30px">By section</h2><div class="brk">'+brk+'</div>'+
+    '<div class="actions" style="margin-top:28px"><button class="btn primary" id="again" type="button">New round</button></div>'+
+    (wrong.length?'<h2 style="margin-top:34px">Missed questions</h2><div class="rev">'+rev+'</div>':'');
+  document.getElementById("again").onclick=home;
+  window.scrollTo(0,0);
+}
+
+/* ---------- question bank ---------- */
+var bankTab="browse",editing=null,bankQuery="",bankSec="",delArm=null,flashMsg="",formFlag=false,formSec=SECTIONS[0].id;
+function toggleFlag(id){if(store.exam[id])delete store.exam[id];else store.exam[id]={t:Date.now()};save()}
+function qRow(q){
+  var on=!!store.exam[q.id];
+  var act='<button type="button" class="flag" data-flag="'+q.id+'" aria-pressed="'+on+'"><span class="box">'+(on?"\u2713":"")+'</span>Came up in my exam</button>';
+  if(q.custom){act+='<button type="button" class="btn link" data-edit="'+q.id+'">Edit</button><button type="button" class="btn link" data-del="'+q.id+'">'+(delArm===q.id?"Sure? Delete":"Delete")+'</button>'}
+  return '<div class="qrow"><span class="meta">'+esc(SEC[q.s]?SEC[q.s].name:q.s)+(q.custom?'<span class="tag">yours</span>':'')+'</span><span class="qt">'+fmt(q.q)+'</span><span class="rowact">'+act+'</span></div>';
+}
+function secOptions(sel,withAll){
+  return (withAll?'<option value="">All sections</option>':'')+SECTIONS.map(function(s){return '<option value="'+s.id+'"'+(s.id===sel?' selected':'')+'>'+esc(s.name)+'</option>'}).join("");
+}
+function formHtml(){
+  var opts=[0,1,2,3].map(function(i){
+    return '<div class="optrow"><input type="radio" name="correct" id="f-c'+i+'" value="'+i+'" aria-label="Option '+LETTERS[i]+' is the correct answer"><input type="text" id="f-o'+i+'" placeholder="Option '+LETTERS[i]+(i<2?' (required)':' (optional)')+'" autocomplete="off"></div>';
+  }).join("");
+  return '<div class="field"><label for="f-sec">Section</label><select id="f-sec">'+secOptions(formSec,false)+'</select></div>'+
+    '<div class="field"><label for="f-q">Question</label><textarea id="f-q" placeholder="Write the question as you remember it"></textarea></div>'+
+    '<div class="field"><label for="f-code">Code or query shown with the question (optional)</label><textarea id="f-code" class="mono" spellcheck="false"></textarea></div>'+
+    '<div class="field"><span class="lbl">Answer options. Select the circle next to the correct one.</span>'+opts+'</div>'+
+    '<div class="field"><label for="f-exp">Explanation (optional)</label><textarea id="f-exp" placeholder="Why the answer is right, or what to remember"></textarea></div>'+
+    '<div class="field"><button type="button" class="flag" id="f-flag" aria-pressed="'+formFlag+'" style="justify-self:start"><span class="box">'+(formFlag?"\u2713":"")+'</span>Came up in my exam</button></div>'+
+    '<div class="actions"><button class="btn primary" id="f-save" type="button">'+(editing?'Save changes':'Add question')+'</button>'+(editing?'<button class="btn" id="f-cancel" type="button">Cancel</button>':'')+'<span class="ok-note" id="f-msg" role="status"></span></div>'+
+    '<p class="err" id="f-err" role="alert"></p>';
+}
+function fillList(){
+  var el=document.getElementById("blist");if(!el)return;
+  var Q=all(),list,cap=80;
+  if(bankTab==="flagged")list=Q.filter(function(q){return store.exam[q.id]});
+  else{var t=bankQuery.toLowerCase();list=Q.filter(function(q){return (!bankSec||q.s===bankSec)&&(!t||(q.q+" "+(q.c||"")).toLowerCase().indexOf(t)>=0)})}
+  var html=list.slice(0,cap).map(qRow).join("");
+  if(!list.length)html='<p class="small" style="margin-top:16px">'+(bankTab==="flagged"?"Nothing marked yet. Tick \u201cCame up in my exam\u201d on any question, here or while practising.":"No questions match.")+'</p>';
+  else if(list.length>cap)html+='<p class="small" style="margin-top:12px">Showing the first '+cap+' of '+list.length+'. Narrow the search to see more.</p>';
+  el.innerHTML=html;
+}
+function bank(){
+  stopTimer();view="bank";ses=null;
+  var Q=all(),nf=Q.filter(function(q){return store.exam[q.id]}).length;
+  var tabs=[["browse","Browse"],["add",editing?"Edit question":"Add question"],["flagged","Seen in exam ("+nf+")"]];
+  var h='<button class="btn link" id="back" type="button">&larr; Back</button>'+
+    '<h1 style="font-size:clamp(1.7rem,6vw,2.4rem);margin-top:8px">Question bank</h1>'+
+    '<div class="tabs" role="tablist">'+tabs.map(function(t){return '<button class="tab" role="tab" type="button" data-tab="'+t[0]+'" aria-selected="'+(bankTab===t[0])+'">'+esc(t[1])+'</button>'}).join("")+'</div>';
+  if(bankTab==="browse"){
+    h+='<div class="controls"><div class="field" style="margin:0;flex:1 1 220px"><label for="bq">Search</label><input type="search" id="bq" placeholder="Type part of a question" autocomplete="off"></div>'+
+       '<div class="field" style="margin:0"><label for="bsec">Section</label><select id="bsec">'+secOptions(bankSec,true)+'</select></div></div><div id="blist"></div>';
+  }else if(bankTab==="add"){h+=formHtml()}
+  else{h+='<p class="lede">Questions you marked as having come up in your real exam. Tick the same box while practising, or from Browse, and use the Exam repeats mode on the home screen to drill them.</p><div id="blist"></div>'}
+  app.innerHTML=h;
+
+  if(bankTab==="browse"){
+    var bq=document.getElementById("bq"),bs=document.getElementById("bsec");
+    bq.value=bankQuery;
+    bq.oninput=function(){bankQuery=bq.value;fillList()};
+    bs.onchange=function(){bankSec=bs.value;fillList()};
+    fillList();
+  }else if(bankTab==="flagged"){fillList()}
+  else{fillForm()}
+}
+function fillForm(){
+  var q=null;
+  if(editing){store.custom.forEach(function(c){if(c.id===editing)q=c})}
+  if(q){
+    document.getElementById("f-sec").value=q.s;
+    document.getElementById("f-q").value=q.q;
+    document.getElementById("f-code").value=q.c||"";
+    q.o.forEach(function(t,i){if(i<4)document.getElementById("f-o"+i).value=t});
+    document.getElementById("f-exp").value=q.e||"";
+    document.getElementById("f-c0").checked=true;
+  }
+  var fl=document.getElementById("f-flag");
+  fl.onclick=function(){formFlag=!formFlag;fl.setAttribute("aria-pressed",String(formFlag));fl.querySelector(".box").textContent=formFlag?"\u2713":""};
+  document.getElementById("f-save").onclick=saveForm;
+  var c=document.getElementById("f-cancel");
+  if(c)c.onclick=function(){editing=null;bankTab="browse";bank()};
+  document.getElementById("f-sec").onchange=function(e){formSec=e.target.value};
+  document.getElementById("f-msg").textContent=flashMsg;flashMsg="";
+}
+function saveForm(){
+  var err=document.getElementById("f-err");err.textContent="";
+  var qt=document.getElementById("f-q").value.trim();
+  if(!qt){err.textContent="Write the question first.";return}
+  var texts=[0,1,2,3].map(function(i){return document.getElementById("f-o"+i).value.trim()});
+  if(texts.filter(Boolean).length<2){err.textContent="Add at least two answer options.";return}
+  var cr=document.querySelector('input[name="correct"]:checked');
+  if(!cr||!texts[+cr.value]){err.textContent="Select the circle next to the correct option, and fill that option in.";return}
+  var ci=+cr.value,o=[texts[ci]];
+  texts.forEach(function(t,i){if(t&&i!==ci)o.push(t)});
+  var sec=document.getElementById("f-sec").value;formSec=sec;
+  var rec={s:sec,q:qt,o:o,e:document.getElementById("f-exp").value.trim(),custom:true};
+  var code=document.getElementById("f-code").value.replace(/\s+$/,"");
+  if(code.trim())rec.c=code;
+  if(editing){
+    rec.id=editing;
+    store.custom=store.custom.map(function(c){return c.id===editing?rec:c});
+  }else{
+    rec.id="c"+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36);
+    store.custom.push(rec);
+  }
+  if(formFlag)store.exam[rec.id]={t:Date.now()};else delete store.exam[rec.id];
+  save();
+  if(editing){editing=null;formFlag=false;bankTab="browse";bank()}
+  else{formFlag=false;flashMsg="Saved. Add another, or open Browse to see it.";bank()}
+}
+app.addEventListener("click",function(e){
+  if(view!=="bank")return;
+  var b=e.target.closest("button");if(!b)return;
+  if(b.id==="back"){editing=null;home();return}
+  if(b.hasAttribute("data-tab")){
+    var t=b.getAttribute("data-tab");
+    if(t!=="add"){editing=null}
+    bankTab=t;delArm=null;bank();return;
+  }
+  if(b.hasAttribute("data-flag")){toggleFlag(b.getAttribute("data-flag"));bank();return}
+  if(b.hasAttribute("data-edit")){
+    editing=b.getAttribute("data-edit");
+    var rec=null;store.custom.forEach(function(c){if(c.id===editing)rec=c});
+    formFlag=!!store.exam[editing];if(rec)formSec=rec.s;
+    bankTab="add";delArm=null;bank();return;
+  }
+  if(b.hasAttribute("data-del")){
+    var id=b.getAttribute("data-del");
+    if(delArm===id){
+      store.custom=store.custom.filter(function(c){return c.id!==id});
+      delete store.stats[id];delete store.exam[id];delArm=null;save();
+    }else{delArm=id}
+    bank();return;
+  }
+});
+
+/* ---------- group progress ---------- */
+function ago(ts){
+  var m=Math.round((Date.now()-ts)/60000);
+  if(!(m>=0))return "";
+  if(m<1)return "just now";
+  if(m<60)return m+" min ago";
+  var h=Math.round(m/60);
+  if(h<48)return h+" h ago";
+  return Math.round(h/24)+" days ago";
+}
+function renderGroup(docs){
+  lastDocs=docs;
+  var el=document.getElementById("glist");if(!el)return;
+  var cnt=document.getElementById("gcount");
+  if(!docs.length){
+    el.innerHTML='<p class="small" style="margin-top:16px">No one has signed in yet. Each person appears here the first time they open this page signed in to Claude.</p>';
+    if(cnt)cnt.textContent="";
+    return;
+  }
+  var rows=docs.map(function(d){
+    var x=d.data()||{},y=curExam==="assoc"?(x.assoc||{}):x;
+    return {id:d.id,total:+y.total||builtinCount(),ok:+y.ok||0,seen:+y.seen||0,rounds:+x.rounds||0,
+      mock:(typeof y.mockBest==="number"&&y.mockBest>=0)?y.mockBest:null,active:+x.active||0,
+      logins:+x.logins||0,last:+x.lastLogin||0,first:+x.firstSeen||0,sec:y.sec||{}};
+  });
+  rows.sort(function(a,b){return (onlineIds[b.id]?1:0)-(onlineIds[a.id]?1:0)||b.ok-a.ok||b.seen-a.seen});
+  var online=rows.filter(function(r){return onlineIds[r.id]}).length;
+  if(cnt)cnt.textContent=rows.length+" signed in so far, "+online+" online now.";
+  userNs.profiles(rows.map(function(r){return r.id})).then(function(ps){
+    if(view!=="group")return;
+    var box=document.getElementById("glist");if(!box)return;
+    box.innerHTML=rows.map(function(r){
+      var p=ps[r.id]||{name:"",isMe:false},on=!!onlineIds[r.id];
+      var det=SECTIONS.map(function(s){
+        var b=r.sec[s.id]||{},t=+b.t||0,ok=+b.ok||0;
+        return '<span>'+esc(s.name)+'</span><span class="bar" aria-hidden="true"><i style="width:'+pct(ok,t)+'%;background:'+s.c+'"></i></span><span class="num small">'+ok+'/'+t+'</span>';
+      }).join("");
+      var meta=[];
+      meta.push(on?'online now':(r.last?'last signed in '+ago(r.last):'not seen yet'));
+      if(r.logins)meta.push(r.logins+' sign-in'+(r.logins===1?'':'s'));
+      if(r.first)meta.push('first seen '+new Date(r.first).toLocaleDateString(undefined,{day:"numeric",month:"short"}));
+      meta.push(r.seen+' answered');
+      meta.push(r.rounds+' round'+(r.rounds===1?'':'s'));
+      if(r.mock!==null)meta.push('best mock exam '+r.mock+'%');
+      return '<details class="grow"><summary><span class="gname"><span class="dot'+(on?' on':'')+'" title="'+(on?'Online now':'Offline')+'"></span>'+esc(p.name||"Someone")+(p.isMe?'<span class="tag">you</span>':'')+'</span>'+
+        '<span class="bar" aria-hidden="true"><i style="width:'+pct(r.ok,r.total)+'%"></i></span><span class="num">'+r.ok+'/'+r.total+'</span></summary>'+
+        '<div class="gdet"><div class="brk">'+det+'</div><p class="small" style="margin-top:12px">'+esc(meta.join(" · "))+'</p></div></details>';
+    }).join("");
+  });
+}
+function group(){
+  stopTimer();view="group";ses=null;lastDocs=null;
+  var note=shareState==="denied"?"You have view-only access, so your own progress is not shared here.":
+           progRef?"Your totals are shared with this group whenever you answer questions.":"";
+  app.innerHTML='<button class="btn link" id="back" type="button">&larr; Back</button>'+
+    '<h1 style="font-size:clamp(1.7rem,6vw,2.4rem);margin-top:8px">Group progress</h1>'+
+    '<p class="lede">Sign-in is handled by Claude: invite people by email from the Share menu, and each person appears here the first time they open this page signed in. A green dot means they have the page open right now. Only totals per section are shared, never answers or your own questions. Each count is the number correct on the last try, out of the '+builtinCount()+' built-in '+EXAMS[curExam].short+' questions (switch exams on the home screen).</p>'+
+    '<p class="small" style="margin-top:10px">'+esc(note)+'</p>'+
+    '<p class="small" id="gcount" style="margin-top:6px;font-weight:600"></p>'+
+    '<div id="glist" style="margin-top:14px;border-top:1px solid var(--line)"></div>';
+  document.getElementById("back").onclick=home;
+  var box=document.getElementById("glist");
+  if(!progCol){box.innerHTML='<p class="small" style="margin-top:16px">Group progress needs this page opened while signed in to Claude. If you only just opened it, wait a moment and open this screen again.</p>';return}
+  box.innerHTML='<p class="small" style="margin-top:16px">Loading...</p>';
+  unsubGroup=progCol.onSnapshot(function(snap){
+    renderGroup(snap.docs.filter(function(d){return d.exists}));
+  },function(){
+    var e=document.getElementById("glist");
+    if(e)e.innerHTML='<p class="err" style="margin-top:16px">Could not load group progress.</p>';
+  });
+}
+
+home();
+connect();
+})();
+</script>
+</body></html>
