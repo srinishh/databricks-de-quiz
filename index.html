@@ -732,6 +732,10 @@ var PAL=["--pink","--cyan","--yellow","--lime","--orange","--violet","--mint","-
 PRO_SECTIONS.forEach(function(s,i){SEC[s.id]=s;s.c="var("+PAL[i]+")"});
 ASSOC_SECTIONS.forEach(function(s,i){SEC[s.id]=s;s.c="var("+PAL[i]+")"});
 
+/* ---------- Google Sheets sync ----------
+   Paste your Apps Script Web App URL here (see SHEETS_SETUP.md). Leave it empty to keep progress in this browser only. */
+var SHEETS_URL="";
+
 /* ---------- storage (per-viewer convenience; the page works without it) ---------- */
 var BASEKEY="lakehouse-pro-quiz-v1",USERS_KEY=BASEKEY+":users",CUR_KEY=BASEKEY+":current";
 var KEY=BASEKEY,localUser=null;
@@ -754,6 +758,13 @@ setExam(store.which);
 var dbDoc=null,progRef=null,progCol=null,userNs=null,unsubGroup=null,roomNs=null,onlineIds={},lastDocs=null,shareState="off",syncState="local",writing=false,pending=false,saveTimer=null;
 function setNote(){
   var e=document.getElementById("syncnote");if(!e)return;
+  if(localUser){
+    e.textContent=syncState==="sheet"?"Progress for "+localUser+" syncs to Google Sheets, so it follows you to any device where you use the same username. ":
+      syncState==="syncing"?"Syncing progress for "+localUser+"... ":
+      syncState==="error"?"Could not reach Google Sheets just now; progress is saved in this browser and will sync on the next answer. ":
+      "Progress for "+localUser+" is saved in this browser only. ";
+    return;
+  }
   e.textContent=syncState==="cloud"?"Progress and your own questions are saved to your Claude account and this browser. ":
     syncState==="error"?"Could not reach your account just now; saved in this browser only. ":
     localUser?"Progress for "+localUser+" is saved in this browser only. ":"Progress is saved in this browser only. ";
@@ -762,6 +773,7 @@ function save(){
   store.updated=Date.now();
   try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}
   if(dbDoc){pending=true;if(!saveTimer)saveTimer=setTimeout(flush,800)}
+  if(localUser&&SHEETS_URL){sheetPending=true;clearTimeout(sheetTimer);sheetTimer=setTimeout(sheetFlush,1500)}
 }
 function examSummary(sections){
   var ids={},sec={},seen=0,ok=0,total=0;
@@ -889,7 +901,7 @@ function home(){
   app.innerHTML=
     '<p class="label chip" style="--c:var(--cyan);color:var(--on)">'+esc(E.name)+'</p>'+
     '<h1 style="margin-top:16px">Lakehouse <span class="hl">Pro</span> Quiz</h1>'+
-    (localUser?'<p class="userbar"><span>Signed in as <b>'+esc(localUser)+'</b></span><button class="btn link" id="signout" type="button">Sign out</button></p>':'')+
+    (localUser?'<p class="userbar"><span>Studying as <b>'+esc(localUser)+'</b></span><button class="btn link" id="signout" type="button">Switch user</button></p>':'')+
     '<div class="seg" role="group" aria-label="Choose the exam"><button type="button" class="segbtn" data-exam="pro" aria-pressed="'+(curExam==="pro")+'">Professional</button><button type="button" class="segbtn" data-exam="assoc" aria-pressed="'+(curExam==="assoc")+'">Associate</button></div>'+
     '<p class="lede">Practice questions grouped by the sections of the official exam guide, with the real weightings. The built-in questions are original and written for study, not real exam items. Add your own from the question bank.</p>'+
     '<div class="stats">'+
@@ -1300,98 +1312,141 @@ function group(){
   });
 }
 
-/* ---------- local sign-in (used when the page is not running inside Claude) ---------- */
-function users(){return readJSON(USERS_KEY)||{}}
-function ukey(name){return name.trim().replace(/\s+/g," ").toLowerCase()}
-function rand(){var a=new Uint8Array(12);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach(function(_,i){a[i]=Math.random()*256|0});return Array.prototype.map.call(a,function(b){return("0"+b.toString(16)).slice(-2)}).join("")}
-function hashPw(pw,salt){
-  var txt=salt+":"+pw;
-  if(window.crypto&&crypto.subtle&&window.TextEncoder){
-    return crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt)).then(function(b){
-      return Array.prototype.map.call(new Uint8Array(b),function(x){return("0"+x.toString(16)).slice(-2)}).join("")});
+/* ---------- Google Sheets API (Apps Script Web App) ---------- */
+/* Fetch one user's row. Resolves to the stored data, or null if the user has no row yet. */
+function loadProgress(username){
+  if(!SHEETS_URL)return Promise.reject(new Error("SHEETS_URL is not set"));
+  return fetch(SHEETS_URL+"?username="+encodeURIComponent(username),{cache:"no-store"})
+    .then(function(r){return r.json()})
+    .then(function(j){if(!j.ok)throw new Error(j.error||"load failed");return j.found?j.data:null});
+}
+/* Create or update one user's row. text/plain avoids a CORS preflight, which Apps Script cannot answer. */
+function saveProgress(username,data,opts){
+  if(!SHEETS_URL)return Promise.reject(new Error("SHEETS_URL is not set"));
+  return fetch(SHEETS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({username:username,data:data}),keepalive:!!(opts&&opts.keepalive)})
+    .then(function(r){return r.json()})
+    .then(function(j){if(!j.ok)throw new Error(j.error||"save failed");return j});
+}
+/* The row written for the current user: summary columns for reading the sheet, plus the full state for syncing. */
+function progressData(){
+  var st=store.stats,answered=0,correct=0;
+  Object.keys(st).forEach(function(id){answered++;if(st[id]&&st[id].ok)correct++});
+  function secs(sections){
+    var r={},x=examSummary(sections).sec;
+    Object.keys(x).forEach(function(k){r[k]={correct:x[k].ok,answered:x[k].n,total:x[k].t}});
+    return r;
   }
-  var h=5381;for(var i=0;i<txt.length;i++){h=((h<<5)+h+txt.charCodeAt(i))|0}
-  return Promise.resolve("d"+(h>>>0).toString(36));
+  return {totalAnswered:answered,totalCorrect:correct,
+    sectionScores:{pro:secs(PRO_SECTIONS),assoc:secs(ASSOC_SECTIONS)},
+    mockBestPro:typeof store.mockBest==="number"?store.mockBest:null,
+    mockBestAssoc:typeof store.mockBestA==="number"?store.mockBestA:null,
+    lastUpdated:store.updated||Date.now(),state:store};
 }
-function profileSummary(k){
-  var d=readJSON(BASEKEY+":u:"+k)||{},st=d.stats||{},ok=0,n=0;
-  Object.keys(st).forEach(function(id){n++;if(st[id]&&st[id].ok)ok++});
-  return {ok:ok,n:n,last:d.lastLogin||0};
+var sheetPending=false,sheetBusy=false,sheetTimer=null;
+function sheetFlush(keepalive){
+  clearTimeout(sheetTimer);sheetTimer=null;
+  if(!localUser||!SHEETS_URL||!sheetPending)return;
+  if(sheetBusy){sheetTimer=setTimeout(sheetFlush,800);return}
+  sheetPending=false;sheetBusy=true;
+  var who=localUser;
+  saveProgress(who,progressData(),{keepalive:keepalive}).then(function(res){
+    if(res.stale&&who===localUser)return pullSheet();
+    syncState="sheet";setNote();
+  }).catch(function(){sheetPending=true;syncState="error";setNote()})
+    .then(function(){sheetBusy=false});
 }
-var loginTab="signin";
-function login(prefill){
+/* Take the sheet copy if it is newer than this browser's, otherwise push ours up. */
+function pullSheet(){
+  if(!localUser||!SHEETS_URL)return Promise.resolve();
+  var who=localUser;
+  if(syncState!=="sheet"){syncState="syncing";setNote()}
+  return loadProgress(who).then(function(remote){
+    if(who!==localUser)return;
+    if(remote&&remote.state&&typeof remote.state==="object"&&(remote.lastUpdated||0)>(store.updated||0)){
+      store=remote.state;store.updated=remote.lastUpdated;norm();setExam(store.which);
+      writeJSON(KEY,store);
+      if(view==="home")home();else if(view==="bank")bank();
+    }else if(hasContent()&&(!remote||(store.updated||0)>(remote.lastUpdated||0))){
+      sheetPending=true;sheetFlush();
+    }
+    syncState="sheet";setNote();
+  }).catch(function(){if(who===localUser){syncState="error";setNote()}});
+}
+document.addEventListener("visibilitychange",function(){
+  if(!localUser||!SHEETS_URL)return;
+  if(document.visibilityState==="hidden")sheetFlush(true);
+  else if(!ses&&!sheetPending)pullSheet();
+});
+
+/* ---------- username (used when the page is not running inside Claude) ---------- */
+function cleanName(n){return String(n||"").trim().toLowerCase().replace(/\s+/g,"-").replace(/[^a-z0-9._-]/g,"")}
+/* Carry over profiles from the earlier password version and from before profiles existed. */
+function migrateLocal(){
+  var U=readJSON(USERS_KEY);
+  if(U){
+    Object.keys(U).forEach(function(k){
+      var nk=cleanName(k);
+      if(nk&&nk!==k&&!readJSON(BASEKEY+":u:"+nk)){var d=readJSON(BASEKEY+":u:"+k);if(d)writeJSON(BASEKEY+":u:"+nk,d)}
+    });
+    try{localStorage.removeItem(USERS_KEY)}catch(e){}
+  }
+}
+function localNames(){
+  var out=[];
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf(BASEKEY+":u:")===0)out.push(k.slice(BASEKEY.length+3))}}catch(e){}
+  return out.sort();
+}
+function askName(prefill){
   stopTimer();view="login";ses=null;
-  var U=users(),keys=Object.keys(U).sort(function(a,b){return profileSummary(b).last-profileSummary(a).last});
-  if(!keys.length)loginTab="create";
-  var list=keys.map(function(k){
-    var p=profileSummary(k);
-    return '<button type="button" class="profile" data-name="'+esc(U[k].name)+'"><b>'+esc(U[k].name)+'</b><span class="num">'+p.ok+' correct &middot; '+p.n+' answered'+(p.last?' &middot; '+esc(ago(p.last)):'')+'</span></button>';
-  }).join("");
-  var creating=loginTab==="create";
+  var names=localNames();
   app.innerHTML='<div class="login">'+
     '<p class="label chip" style="--c:var(--cyan);color:var(--on)">Databricks Data Engineer</p>'+
     '<h1 style="margin-top:16px">Lakehouse <span class="hl">Pro</span> Quiz</h1>'+
-    '<div class="seg" role="group" aria-label="Sign in or create a profile"><button type="button" class="segbtn" data-tab="signin" aria-pressed="'+!creating+'">Sign in</button><button type="button" class="segbtn" data-tab="create" aria-pressed="'+creating+'">Create profile</button></div>'+
-    '<p class="lede">'+(creating?'Pick a name and password. Your answers, mock exam scores and own questions are kept separately from everyone else using this browser.':'Sign in to pick up where you left off.')+'</p>'+
+    '<p class="lede">Pick a username to keep your progress under. '+(SHEETS_URL?'Use the same one on any device and your progress follows you.':'Progress is saved in this browser.')+'</p>'+
     '<form id="lf" novalidate>'+
-      '<div class="field"><label for="l-name">Name</label><input type="text" id="l-name" autocomplete="username" maxlength="40" value="'+esc(prefill||"")+'"></div>'+
-      '<div class="field"><label for="l-pw">Password</label><input type="password" id="l-pw" autocomplete="'+(creating?'new-password':'current-password')+'"></div>'+
-      (creating?'<div class="field"><label for="l-pw2">Confirm password</label><input type="password" id="l-pw2" autocomplete="new-password"></div>':'')+
-      '<div class="actions" style="margin-top:20px"><button class="btn primary" type="submit">'+(creating?'Create profile':'Sign in')+'</button></div>'+
+      '<div class="field"><label for="l-name">Username</label><input type="text" id="l-name" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="40" placeholder="e.g. priya.k" value="'+esc(prefill||"")+'"></div>'+
+      '<p class="small" style="margin-top:6px">Letters, numbers, dots, dashes and underscores.</p>'+
+      '<div class="actions" style="margin-top:18px"><button class="btn primary" type="submit">Continue</button></div>'+
       '<p class="err" id="l-err" role="alert"></p>'+
     '</form>'+
-    (keys.length&&!creating?'<h2 style="margin-top:28px">Profiles on this browser</h2><div class="profiles">'+list+'</div>':'')+
-    '<p class="small" style="margin-top:28px">Profiles are stored in this browser only, so progress does not follow you to another device. The password keeps profiles apart on a shared computer; it is not a secure account.</p>'+
+    (names.length?'<h2 style="margin-top:24px">Used on this browser</h2><div class="profiles">'+names.map(function(n){
+      return '<button type="button" class="profile" data-name="'+esc(n)+'"><b>'+esc(n)+'</b><span class="num">continue &rarr;</span></button>'}).join("")+'</div>':'')+
+    '<p class="small" style="margin-top:28px">There is no password: anyone who enters the same username sees and updates the same progress, so pick something others are unlikely to guess.</p>'+
     '</div>';
-  Array.prototype.forEach.call(document.querySelectorAll(".segbtn"),function(b){b.onclick=function(){loginTab=b.getAttribute("data-tab");login(document.getElementById("l-name").value)}});
-  Array.prototype.forEach.call(document.querySelectorAll(".profile"),function(b){b.onclick=function(){
-    document.getElementById("l-name").value=b.getAttribute("data-name");document.getElementById("l-pw").focus()}});
-  var nameEl=document.getElementById("l-name");
-  (nameEl.value?document.getElementById("l-pw"):nameEl).focus();
+  Array.prototype.forEach.call(document.querySelectorAll(".profile"),function(b){b.onclick=function(){useName(b.getAttribute("data-name"))}});
+  var el=document.getElementById("l-name");el.focus();
   document.getElementById("lf").onsubmit=function(ev){
     ev.preventDefault();
-    var err=document.getElementById("l-err"),name=nameEl.value.trim().replace(/\s+/g," "),pw=document.getElementById("l-pw").value,k=ukey(name),U=users();
-    if(!name){err.textContent="Enter your name.";return}
-    if(!pw){err.textContent="Enter a password.";return}
-    if(creating){
-      if(U[k]){err.textContent="That name is taken on this browser. Sign in instead, or pick another name.";return}
-      if(pw.length<4){err.textContent="Use at least 4 characters for the password.";return}
-      if(pw!==document.getElementById("l-pw2").value){err.textContent="The passwords do not match.";return}
-      var salt=rand(),first=!Object.keys(U).length;
-      hashPw(pw,salt).then(function(h){
-        U=users();U[k]={name:name,salt:salt,hash:h,created:Date.now()};writeJSON(USERS_KEY,U);
-        /* the first profile keeps any progress saved before sign-in existed */
-        if(first){var legacy=readJSON(BASEKEY);if(legacy&&!readJSON(BASEKEY+":u:"+k))writeJSON(BASEKEY+":u:"+k,legacy)}
-        signIn(k);
-      });
-    }else{
-      if(!U[k]){err.textContent="No profile with that name on this browser. Create one first.";return}
-      hashPw(pw,U[k].salt).then(function(h){
-        if(h!==U[k].hash){err.textContent="Wrong password.";return}
-        signIn(k);
-      });
-    }
+    var n=cleanName(el.value);
+    if(!n){document.getElementById("l-err").textContent="Enter a username.";return}
+    useName(n);
   };
 }
-function signIn(k){
-  var U=users();if(!U[k]){login();return}
-  localUser=U[k].name;KEY=BASEKEY+":u:"+k;
-  try{localStorage.setItem(CUR_KEY,k)}catch(e){}
+function useName(n){
+  n=cleanName(n);if(!n){askName();return}
+  var first=!localNames().length;
+  localUser=n;KEY=BASEKEY+":u:"+n;
+  try{localStorage.setItem(CUR_KEY,n)}catch(e){}
+  if(first&&!readJSON(KEY)){var legacy=readJSON(BASEKEY);if(legacy)writeJSON(KEY,legacy)}
   store=load();norm();setExam(store.which);
-  store.logins=(store.logins||0)+1;store.lastLogin=Date.now();
-  if(!store.firstSeen)store.firstSeen=store.lastLogin;
-  save();home();
+  syncState="local";sheetPending=false;
+  home();
+  if(SHEETS_URL)pullSheet();
 }
 function signOut(){
+  sheetFlush(true);
   try{localStorage.removeItem(CUR_KEY)}catch(e){}
-  var name=localUser;localUser=null;KEY=BASEKEY;store={};norm();
-  loginTab="signin";login(name);
+  var name=localUser;localUser=null;KEY=BASEKEY;store={};norm();syncState="local";
+  askName(name);
 }
 
 if(HOSTED){home();connect()}
 else{
+  migrateLocal();
   var cur=null;try{cur=localStorage.getItem(CUR_KEY)}catch(e){}
-  if(cur&&users()[cur])signIn(cur);else login();
+  cur=cleanName(cur);
+  if(cur)useName(cur);else askName();
 }
 })();
 </script>
