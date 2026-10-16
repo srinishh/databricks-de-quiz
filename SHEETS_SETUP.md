@@ -16,7 +16,14 @@ You don't need to add headers. The script creates a `Progress` tab with these co
 
 - **SectionScores**: JSON of correct, answered and total per section, for both exams.
 - **MockBestPro / MockBestAssoc**: best mock exam percentage for each exam.
-- **State**: the full progress JSON the quiz needs to restore a user on another device (answers per question, history, the user's own questions, exam marks). Don't edit it by hand.
+- **State**: the full progress JSON the quiz needs to restore a user on another device (answers per question, history, exam marks). Don't edit it by hand.
+
+The first time someone saves a question to their question bank, the script also creates a `Questions` tab with one row per question:
+
+| Username | QuestionId | Exam | SectionId | Section | Question | Code | CorrectAnswer | Option2 | Option3 | Option4 | Explanation | SeenInExam | Updated |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+
+Each user's question bank is private to their username. Whenever someone adds, edits or deletes a question, the quiz replaces that user's rows.
 
 ## 2. Paste the Apps Script
 
@@ -60,6 +67,9 @@ Save, commit and redeploy the quiz. The footer of the home screen now says progr
 
 ## Updating the script later
 
+> **Already deployed an earlier version?** The question bank tab needs the latest `Code.gs`. Paste it over the old code, save, and redeploy as a new version as described below. Your Web App URL stays the same, and each user's existing questions move into the `Questions` tab the next time they open the quiz.
+
+
 If you change `Code.gs`, use **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy**. This keeps the same URL. *New deployment* would create a new URL that you'd have to paste into `index.html` again.
 
 ## How syncing behaves
@@ -72,5 +82,6 @@ If you change `Code.gs`, use **Deploy → Manage deployments → ✏️ Edit →
 ## Limits to know about
 
 - **No password.** Anyone who knows the Web App URL and a username can read or overwrite that user's progress. That's fine for study progress. Don't store anything sensitive.
-- **Cell size.** One cell holds at most 50,000 characters. Normal use is far below that, but hundreds of long custom questions could exceed it. The save is then refused and that user's progress stays in their browser only.
+- **Cell size.** One cell holds at most 50,000 characters. Questions are stored one per row, so this limit only applies to a single very long field.
+- **Editing questions in the sheet.** You can read the `Questions` tab freely. Edits made there are overwritten the next time that user changes their question bank in the quiz, and a device that already has the user's progress may not pick them up.
 - **Apps Script quotas.** The free quotas cover a study group with plenty of room. Each save is one request, sent at most once every couple of seconds while someone answers questions.

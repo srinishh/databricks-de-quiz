@@ -1318,7 +1318,7 @@ function loadProgress(username){
   if(!SHEETS_URL)return Promise.reject(new Error("SHEETS_URL is not set"));
   return fetch(SHEETS_URL+"?username="+encodeURIComponent(username),{cache:"no-store"})
     .then(function(r){return r.json()})
-    .then(function(j){if(!j.ok)throw new Error(j.error||"load failed");return j.found?j.data:null});
+    .then(function(j){sheetV=+j.v||1;if(!j.ok)throw new Error(j.error||"load failed");return j.found?j.data:null});
 }
 /* Create or update one user's row. text/plain avoids a CORS preflight, which Apps Script cannot answer. */
 function saveProgress(username,data,opts){
@@ -1326,8 +1326,24 @@ function saveProgress(username,data,opts){
   return fetch(SHEETS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
       body:JSON.stringify({username:username,data:data}),keepalive:!!(opts&&opts.keepalive)})
     .then(function(r){return r.json()})
-    .then(function(j){if(!j.ok)throw new Error(j.error||"save failed");return j});
+    .then(function(j){sheetV=+j.v||1;if(!j.ok)throw new Error(j.error||"save failed");return j});
 }
+/* Question bank <-> Questions tab rows. The correct answer is always o[0]. */
+function examOf(sid){for(var i=0;i<ASSOC_SECTIONS.length;i++)if(ASSOC_SECTIONS[i].id===sid)return "assoc";return "pro"}
+function toSheetQuestion(c){
+  var o=c.o||[];
+  return {id:c.id,exam:examOf(c.s),sectionId:c.s,sectionName:SEC[c.s]?SEC[c.s].name:c.s,question:c.q,code:c.c||"",
+    correct:o[0]||"",option2:o[1]||"",option3:o[2]||"",option4:o[3]||"",explanation:c.e||"",seenInExam:!!store.exam[c.id]};
+}
+function fromSheetQuestion(r){
+  var rec={id:r.id,s:SECMAP[r.sectionId]||r.sectionId,q:r.question,
+    o:[r.correct,r.option2,r.option3,r.option4].filter(function(x){return x!==""&&x!=null}),e:r.explanation||"",custom:true};
+  if(r.code)rec.c=r.code;
+  return rec;
+}
+var sheetV=0; /* 2 = the deployed script has the Questions tab; older scripts only keep questions inside State */
+var syncedBank=null; /* question bank as last confirmed in the sheet; only resend it when it changes */
+function bankSig(){return JSON.stringify([store.custom,store.custom.map(function(c){return !!store.exam[c.id]})])}
 /* The row written for the current user: summary columns for reading the sheet, plus the full state for syncing. */
 function progressData(){
   var st=store.stats,answered=0,correct=0;
@@ -1341,17 +1357,20 @@ function progressData(){
     sectionScores:{pro:secs(PRO_SECTIONS),assoc:secs(ASSOC_SECTIONS)},
     mockBestPro:typeof store.mockBest==="number"?store.mockBest:null,
     mockBestAssoc:typeof store.mockBestA==="number"?store.mockBestA:null,
-    lastUpdated:store.updated||Date.now(),state:store};
+    lastUpdated:store.updated||Date.now(),state:sheetV>=2?stateOnly():store};
 }
+function stateOnly(){var o={};Object.keys(store).forEach(function(k){if(k!=="custom")o[k]=store[k]});return o}
 var sheetPending=false,sheetBusy=false,sheetTimer=null;
 function sheetFlush(keepalive){
   clearTimeout(sheetTimer);sheetTimer=null;
   if(!localUser||!SHEETS_URL||!sheetPending)return;
   if(sheetBusy){sheetTimer=setTimeout(sheetFlush,800);return}
   sheetPending=false;sheetBusy=true;
-  var who=localUser;
-  saveProgress(who,progressData(),{keepalive:keepalive}).then(function(res){
+  var who=localUser,data=progressData(),sig=bankSig();
+  if(sheetV>=2&&sig!==syncedBank)data.questions=store.custom.map(toSheetQuestion);
+  saveProgress(who,data,{keepalive:keepalive}).then(function(res){
     if(res.stale&&who===localUser)return pullSheet();
+    if(who===localUser&&data.questions)syncedBank=sig;
     syncState="sheet";setNote();
   }).catch(function(){sheetPending=true;syncState="error";setNote()})
     .then(function(){sheetBusy=false});
@@ -1364,7 +1383,12 @@ function pullSheet(){
   return loadProgress(who).then(function(remote){
     if(who!==localUser)return;
     if(remote&&remote.state&&typeof remote.state==="object"&&(remote.lastUpdated||0)>(store.updated||0)){
-      store=remote.state;store.updated=remote.lastUpdated;norm();setExam(store.which);
+      store=remote.state;store.updated=remote.lastUpdated;
+      /* questions live in their own tab; rows saved before that existed keep them inside state */
+      if(Array.isArray(remote.questions))store.custom=remote.questions.map(fromSheetQuestion);
+      norm();setExam(store.which);
+      if(Array.isArray(remote.questions))syncedBank=bankSig();
+      else if(store.custom.length){syncedBank=null;sheetPending=true;setTimeout(sheetFlush,0)} /* move them into the Questions tab */
       writeJSON(KEY,store);
       if(view==="home")home();else if(view==="bank")bank();
     }else if(hasContent()&&(!remote||(store.updated||0)>(remote.lastUpdated||0))){
@@ -1430,7 +1454,7 @@ function useName(n){
   try{localStorage.setItem(CUR_KEY,n)}catch(e){}
   if(first&&!readJSON(KEY)){var legacy=readJSON(BASEKEY);if(legacy)writeJSON(KEY,legacy)}
   store=load();norm();setExam(store.which);
-  syncState="local";sheetPending=false;
+  syncState="local";sheetPending=false;syncedBank=null;
   home();
   if(SHEETS_URL)pullSheet();
 }
