@@ -197,6 +197,7 @@ function numOrBlank_(n) {
 }
 
 function json_(obj) {
+  obj.v = 2; // tells the quiz this script stores questions in the Questions tab
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
