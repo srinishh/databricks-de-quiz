@@ -164,6 +164,14 @@ pre.code code{background:none;color:inherit;padding:0;font-size:inherit}
 .qrow .meta{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .qrow .rowact{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .tag{font-family:var(--mono);font-size:.7rem;font-weight:700;background:var(--violet);color:var(--on);border:2px solid var(--edge);border-radius:99px;padding:0 8px;margin-left:8px;letter-spacing:.04em;text-transform:uppercase}
+.login{max-width:440px}
+.login .field input[type=password]{font:inherit;background:var(--surface);color:var(--ink);border:2px solid var(--edge);border-radius:10px;padding:9px 11px;width:100%;min-width:0}
+.profiles{margin-top:10px;border-top:1px solid var(--line)}
+.profile{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 2px;color:var(--ink);font:inherit}
+.profile:hover{background:var(--code-bg);color:var(--code-ink)}
+.profile b{font-weight:700}
+.profile .num{font-family:var(--mono);font-size:.86rem;font-variant-numeric:tabular-nums}
+.userbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:14px;font-size:.92rem}
 .ok-note{color:var(--good);font-size:.92rem;font-weight:700}
 
 /* group progress */
@@ -725,9 +733,13 @@ PRO_SECTIONS.forEach(function(s,i){SEC[s.id]=s;s.c="var("+PAL[i]+")"});
 ASSOC_SECTIONS.forEach(function(s,i){SEC[s.id]=s;s.c="var("+PAL[i]+")"});
 
 /* ---------- storage (per-viewer convenience; the page works without it) ---------- */
-var KEY="lakehouse-pro-quiz-v1";
-function load(){try{var v=JSON.parse(localStorage.getItem(KEY));return v&&typeof v==="object"?v:{}}catch(e){return {}}}
-var store=load();
+var BASEKEY="lakehouse-pro-quiz-v1",USERS_KEY=BASEKEY+":users",CUR_KEY=BASEKEY+":current";
+var KEY=BASEKEY,localUser=null;
+var HOSTED=!!(window.claude&&window.claude.use);
+function readJSON(k){try{var v=JSON.parse(localStorage.getItem(k));return v&&typeof v==="object"?v:null}catch(e){return null}}
+function writeJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(){return readJSON(KEY)||{}}
+var store=HOSTED?load():{};
 function norm(){store.stats=store.stats||{};store.history=store.history||[];store.custom=Array.isArray(store.custom)?store.custom:[];store.exam=store.exam||{};store.custom.forEach(function(c){if(c&&SECMAP[c.s])c.s=SECMAP[c.s]})}
 norm();
 function inExam(q){for(var i=0;i<SECTIONS.length;i++){if(SECTIONS[i].id===q.s)return true}return false}
@@ -744,7 +756,7 @@ function setNote(){
   var e=document.getElementById("syncnote");if(!e)return;
   e.textContent=syncState==="cloud"?"Progress and your own questions are saved to your Claude account and this browser. ":
     syncState==="error"?"Could not reach your account just now; saved in this browser only. ":
-    "Progress is saved in this browser only. ";
+    localUser?"Progress for "+localUser+" is saved in this browser only. ":"Progress is saved in this browser only. ";
 }
 function save(){
   store.updated=Date.now();
@@ -877,6 +889,7 @@ function home(){
   app.innerHTML=
     '<p class="label chip" style="--c:var(--cyan);color:var(--on)">'+esc(E.name)+'</p>'+
     '<h1 style="margin-top:16px">Lakehouse <span class="hl">Pro</span> Quiz</h1>'+
+    (localUser?'<p class="userbar"><span>Signed in as <b>'+esc(localUser)+'</b></span><button class="btn link" id="signout" type="button">Sign out</button></p>':'')+
     '<div class="seg" role="group" aria-label="Choose the exam"><button type="button" class="segbtn" data-exam="pro" aria-pressed="'+(curExam==="pro")+'">Professional</button><button type="button" class="segbtn" data-exam="assoc" aria-pressed="'+(curExam==="assoc")+'">Associate</button></div>'+
     '<p class="lede">Practice questions grouped by the sections of the official exam guide, with the real weightings. The built-in questions are original and written for study, not real exam items. Add your own from the question bank.</p>'+
     '<div class="stats">'+
@@ -911,6 +924,7 @@ function home(){
   document.getElementById("m-repeat").onclick=function(){startPractice("repeat")};
   document.getElementById("m-exam").onclick=startExam;
   document.getElementById("m-bank").onclick=function(){bankTab="browse";editing=null;bank()};
+  var so=document.getElementById("signout");if(so)so.onclick=signOut;
   
   var r=document.getElementById("reset");
   if(r){var armed=false;r.onclick=function(){
@@ -1286,8 +1300,99 @@ function group(){
   });
 }
 
-home();
-connect();
+/* ---------- local sign-in (used when the page is not running inside Claude) ---------- */
+function users(){return readJSON(USERS_KEY)||{}}
+function ukey(name){return name.trim().replace(/\s+/g," ").toLowerCase()}
+function rand(){var a=new Uint8Array(12);(window.crypto||{}).getRandomValues?crypto.getRandomValues(a):a.forEach(function(_,i){a[i]=Math.random()*256|0});return Array.prototype.map.call(a,function(b){return("0"+b.toString(16)).slice(-2)}).join("")}
+function hashPw(pw,salt){
+  var txt=salt+":"+pw;
+  if(window.crypto&&crypto.subtle&&window.TextEncoder){
+    return crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt)).then(function(b){
+      return Array.prototype.map.call(new Uint8Array(b),function(x){return("0"+x.toString(16)).slice(-2)}).join("")});
+  }
+  var h=5381;for(var i=0;i<txt.length;i++){h=((h<<5)+h+txt.charCodeAt(i))|0}
+  return Promise.resolve("d"+(h>>>0).toString(36));
+}
+function profileSummary(k){
+  var d=readJSON(BASEKEY+":u:"+k)||{},st=d.stats||{},ok=0,n=0;
+  Object.keys(st).forEach(function(id){n++;if(st[id]&&st[id].ok)ok++});
+  return {ok:ok,n:n,last:d.lastLogin||0};
+}
+var loginTab="signin";
+function login(prefill){
+  stopTimer();view="login";ses=null;
+  var U=users(),keys=Object.keys(U).sort(function(a,b){return profileSummary(b).last-profileSummary(a).last});
+  if(!keys.length)loginTab="create";
+  var list=keys.map(function(k){
+    var p=profileSummary(k);
+    return '<button type="button" class="profile" data-name="'+esc(U[k].name)+'"><b>'+esc(U[k].name)+'</b><span class="num">'+p.ok+' correct &middot; '+p.n+' answered'+(p.last?' &middot; '+esc(ago(p.last)):'')+'</span></button>';
+  }).join("");
+  var creating=loginTab==="create";
+  app.innerHTML='<div class="login">'+
+    '<p class="label chip" style="--c:var(--cyan);color:var(--on)">Databricks Data Engineer</p>'+
+    '<h1 style="margin-top:16px">Lakehouse <span class="hl">Pro</span> Quiz</h1>'+
+    '<div class="seg" role="group" aria-label="Sign in or create a profile"><button type="button" class="segbtn" data-tab="signin" aria-pressed="'+!creating+'">Sign in</button><button type="button" class="segbtn" data-tab="create" aria-pressed="'+creating+'">Create profile</button></div>'+
+    '<p class="lede">'+(creating?'Pick a name and password. Your answers, mock exam scores and own questions are kept separately from everyone else using this browser.':'Sign in to pick up where you left off.')+'</p>'+
+    '<form id="lf" novalidate>'+
+      '<div class="field"><label for="l-name">Name</label><input type="text" id="l-name" autocomplete="username" maxlength="40" value="'+esc(prefill||"")+'"></div>'+
+      '<div class="field"><label for="l-pw">Password</label><input type="password" id="l-pw" autocomplete="'+(creating?'new-password':'current-password')+'"></div>'+
+      (creating?'<div class="field"><label for="l-pw2">Confirm password</label><input type="password" id="l-pw2" autocomplete="new-password"></div>':'')+
+      '<div class="actions" style="margin-top:20px"><button class="btn primary" type="submit">'+(creating?'Create profile':'Sign in')+'</button></div>'+
+      '<p class="err" id="l-err" role="alert"></p>'+
+    '</form>'+
+    (keys.length&&!creating?'<h2 style="margin-top:28px">Profiles on this browser</h2><div class="profiles">'+list+'</div>':'')+
+    '<p class="small" style="margin-top:28px">Profiles are stored in this browser only, so progress does not follow you to another device. The password keeps profiles apart on a shared computer; it is not a secure account.</p>'+
+    '</div>';
+  Array.prototype.forEach.call(document.querySelectorAll(".segbtn"),function(b){b.onclick=function(){loginTab=b.getAttribute("data-tab");login(document.getElementById("l-name").value)}});
+  Array.prototype.forEach.call(document.querySelectorAll(".profile"),function(b){b.onclick=function(){
+    document.getElementById("l-name").value=b.getAttribute("data-name");document.getElementById("l-pw").focus()}});
+  var nameEl=document.getElementById("l-name");
+  (nameEl.value?document.getElementById("l-pw"):nameEl).focus();
+  document.getElementById("lf").onsubmit=function(ev){
+    ev.preventDefault();
+    var err=document.getElementById("l-err"),name=nameEl.value.trim().replace(/\s+/g," "),pw=document.getElementById("l-pw").value,k=ukey(name),U=users();
+    if(!name){err.textContent="Enter your name.";return}
+    if(!pw){err.textContent="Enter a password.";return}
+    if(creating){
+      if(U[k]){err.textContent="That name is taken on this browser. Sign in instead, or pick another name.";return}
+      if(pw.length<4){err.textContent="Use at least 4 characters for the password.";return}
+      if(pw!==document.getElementById("l-pw2").value){err.textContent="The passwords do not match.";return}
+      var salt=rand(),first=!Object.keys(U).length;
+      hashPw(pw,salt).then(function(h){
+        U=users();U[k]={name:name,salt:salt,hash:h,created:Date.now()};writeJSON(USERS_KEY,U);
+        /* the first profile keeps any progress saved before sign-in existed */
+        if(first){var legacy=readJSON(BASEKEY);if(legacy&&!readJSON(BASEKEY+":u:"+k))writeJSON(BASEKEY+":u:"+k,legacy)}
+        signIn(k);
+      });
+    }else{
+      if(!U[k]){err.textContent="No profile with that name on this browser. Create one first.";return}
+      hashPw(pw,U[k].salt).then(function(h){
+        if(h!==U[k].hash){err.textContent="Wrong password.";return}
+        signIn(k);
+      });
+    }
+  };
+}
+function signIn(k){
+  var U=users();if(!U[k]){login();return}
+  localUser=U[k].name;KEY=BASEKEY+":u:"+k;
+  try{localStorage.setItem(CUR_KEY,k)}catch(e){}
+  store=load();norm();setExam(store.which);
+  store.logins=(store.logins||0)+1;store.lastLogin=Date.now();
+  if(!store.firstSeen)store.firstSeen=store.lastLogin;
+  save();home();
+}
+function signOut(){
+  try{localStorage.removeItem(CUR_KEY)}catch(e){}
+  var name=localUser;localUser=null;KEY=BASEKEY;store={};norm();
+  loginTab="signin";login(name);
+}
+
+if(HOSTED){home();connect()}
+else{
+  var cur=null;try{cur=localStorage.getItem(CUR_KEY)}catch(e){}
+  if(cur&&users()[cur])signIn(cur);else login();
+}
 })();
 </script>
 </body></html>
