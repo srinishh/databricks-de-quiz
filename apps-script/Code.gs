@@ -3,13 +3,19 @@
  *
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  *
- *   GET  <url>?username=alice          -> { ok, found, data }
- *   POST <url>  body: {"username":"alice","data":{...}}
+ *   GET  <url>?username=alice          -> { ok, found, data }        one user's progress, questions and notes
+ *   GET  <url>?action=all              -> { ok, users: [...] }       summary of every user, for the group dashboard
+ *   POST <url>  body: {"username":"alice","data":{...}}               save progress
+ *   POST <url>  body: {"action":"upload","username":"alice","name":"x.jpg","mime":"image/jpeg","data":"<base64>"}
+ *                                      -> { ok, id }                 store a notes picture in Drive
  *        (send as Content-Type text/plain so the browser skips the CORS preflight)
  *
- * Progress tab: one row per user. Username is the row key (lowercase letters, digits, . _ -).
+ * Progress tab:  one row per user. Username is the row key (lowercase letters, digits, . _ -).
  * Questions tab: one row per question a user added to their question bank.
- *   A POST that includes data.questions replaces that user's rows; one without it leaves them alone.
+ * Notes tab:     one row per notes heading / subheading.
+ *   A POST that includes data.questions (or data.notes) replaces that user's rows in that tab;
+ *   one without it leaves them alone.
+ * Pictures go to a Drive folder named "Lakehouse Quiz Images", shared as view-only by link.
  */
 
 var SHEET_NAME = 'Progress';
@@ -22,15 +28,25 @@ var Q_SHEET_NAME = 'Questions';
 var Q_HEADERS = ['Username', 'QuestionId', 'Exam', 'SectionId', 'Section', 'Question', 'Code',
                  'CorrectAnswer', 'Option2', 'Option3', 'Option4', 'Explanation', 'SeenInExam', 'Updated'];
 
+var N_SHEET_NAME = 'Notes';
+var N_HEADERS = ['Username', 'HeadingId', 'Heading', 'SubheadingId', 'Subheading', 'Order', 'Body', 'Images', 'Updated'];
+
+var IMAGE_FOLDER = 'Lakehouse Quiz Images';
+var IMAGE_TYPES = { 'image/jpeg': 1, 'image/png': 1, 'image/webp': 1, 'image/gif': 1 };
+var MAX_IMAGE_B64 = 4000000; // about 3 MB of image data
+
 function doGet(e) {
   try {
-    var username = cleanUser_(e && e.parameter && e.parameter.username);
+    var p = (e && e.parameter) || {};
+    if (p.action === 'all') return json_({ ok: true, users: allUsers_() });
+    var username = cleanUser_(p.username);
     var sheet = getSheet_();
     var row = findRow_(sheet, username);
     if (!row) return json_({ ok: true, found: false });
     var v = sheet.getRange(row, 1, 1, HEADERS.length).getValues()[0];
     var data = rowToData_(v);
     data.questions = readQuestions_(username);
+    data.notes = readNotes_(username);
     return json_({ ok: true, found: true, data: data });
   } catch (err) {
     return json_({ ok: false, error: String(err && err.message || err) });
@@ -42,6 +58,8 @@ function doPost(e) {
   try {
     var body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     var username = cleanUser_(body.username);
+    if (body.action === 'upload') return json_(uploadImage_(username, body));
+
     var d = body.data || {};
     var updated = Number(d.lastUpdated) || Date.now();
     var sections = JSON.stringify(d.sectionScores || {});
@@ -49,6 +67,7 @@ function doPost(e) {
     if (sections.length > MAX_CELL) throw new Error('sectionScores too large');
     if (state.length > MAX_CELL) throw new Error('state too large for one cell (' + state.length + ' chars)');
     var questions = Array.isArray(d.questions) ? d.questions.map(function (q) { return questionRow_(username, q, updated); }) : null;
+    var notes = Array.isArray(d.notes) ? d.notes.map(function (n) { return noteRow_(username, n, updated); }) : null;
 
     lock.waitLock(10000);
     var sheet = getSheet_();
@@ -73,7 +92,8 @@ function doPost(e) {
       new Date(updated),
       state
     ]]);
-    if (questions) writeQuestions_(username, questions);
+    if (questions) replaceUserRows_(getTab_(Q_SHEET_NAME, Q_HEADERS), Q_HEADERS, username, questions);
+    if (notes) replaceUserRows_(getTab_(N_SHEET_NAME, N_HEADERS), N_HEADERS, username, notes);
     return json_({ ok: true, saved: true, lastUpdated: updated });
   } catch (err) {
     return json_({ ok: false, error: String(err && err.message || err) });
@@ -82,7 +102,51 @@ function doPost(e) {
   }
 }
 
-/* ---------- helpers ---------- */
+/* ---------- group dashboard ---------- */
+
+function allUsers_() {
+  var sheet = getSheet_();
+  var last = sheet.getLastRow();
+  if (last < 2) return [];
+  var qCount = countByUser_(Q_SHEET_NAME, 1), nCount = countByUser_(N_SHEET_NAME, 3);
+  return sheet.getRange(2, 1, last - 1, HEADERS.length - 1).getValues() // everything except State
+    .filter(function (v) { return v[0] !== ''; })
+    .map(function (v) {
+      var d = rowToData_(v.concat(['']));
+      delete d.state;
+      d.questionsAdded = qCount[d.username] || 0;
+      d.notesSections = nCount[d.username] || 0;
+      return d;
+    });
+}
+
+/* Number of non-marker rows per user in a tab (a row counts when column `idCol`, 0-based, is filled). */
+function countByUser_(name, idCol) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name), out = {};
+  if (!sheet || sheet.getLastRow() < 2) return out;
+  sheet.getRange(2, 1, sheet.getLastRow() - 1, idCol + 1).getValues().forEach(function (r) {
+    if (r[0] !== '' && r[idCol] !== '') out[r[0]] = (out[r[0]] || 0) + 1;
+  });
+  return out;
+}
+
+/* ---------- pictures ---------- */
+
+function uploadImage_(username, body) {
+  var mime = String(body.mime || '');
+  var b64 = String(body.data || '');
+  if (!IMAGE_TYPES[mime]) throw new Error('Only JPEG, PNG, WebP or GIF pictures can be added');
+  if (!b64 || b64.length > MAX_IMAGE_B64) throw new Error('Picture is too large');
+  var name = username + '-' + Date.now() + '-' + String(body.name || 'image').replace(/[^\w.-]/g, '_').slice(0, 60);
+  var blob = Utilities.newBlob(Utilities.base64Decode(b64), mime, name);
+  var folders = DriveApp.getFoldersByName(IMAGE_FOLDER);
+  var folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(IMAGE_FOLDER);
+  var file = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return { ok: true, id: file.getId() };
+}
+
+/* ---------- per-user tabs (Questions, Notes) ---------- */
 
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -95,69 +159,99 @@ function getSheet_() {
   return sheet;
 }
 
-function getQuestionSheet_() {
+/* The last column of every per-user tab is the Updated date; everything before it is stored as text. */
+function getTab_(name, headers) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(Q_SHEET_NAME);
+  var sheet = ss.getSheetByName(name);
   if (!sheet) {
-    sheet = ss.insertSheet(Q_SHEET_NAME);
-    sheet.appendRow(Q_HEADERS);
+    sheet = ss.insertSheet(name);
+    sheet.appendRow(headers);
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, sheet.getMaxRows(), Q_HEADERS.length - 2).setNumberFormat('@'); // text, not numbers or formulas
   }
   return sheet;
 }
 
-/* Returns the user's questions, or null when the user has never saved any (older clients kept them in State). */
-function readQuestions_(username) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(Q_SHEET_NAME);
+/* Rows of one user, or null when the user has never saved any (older clients kept them in State). */
+function userRows_(name, headers, username) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
   if (!sheet || sheet.getLastRow() < 2) return null;
-  var rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, Q_HEADERS.length).getValues();
-  var out = [], any = false;
-  rows.forEach(function (r) {
-    if (String(r[0]) !== username) return;
-    any = true;
-    if (!r[1]) return; // marker row: the user has saved an empty question bank
-    out.push({
+  var rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, headers.length).getValues()
+    .filter(function (r) { return String(r[0]) === username; });
+  return rows.length ? rows : null;
+}
+
+/* Replace all of one user's rows with the given ones, keeping everyone else's. */
+function replaceUserRows_(sheet, headers, username, newRows) {
+  var n = headers.length, last = sheet.getLastRow();
+  var keep = last > 1 ? sheet.getRange(2, 1, last - 1, n).getValues()
+    .filter(function (r) { return r[0] !== '' && String(r[0]) !== username; })
+    .map(function (r) { return r.map(function (v, i) { return i < n - 1 && typeof v === 'string' ? text_(v) : v; }); }) : [];
+  // An empty list still gets one marker row so a later load knows it is empty rather than never saved.
+  if (!newRows.length) {
+    var marker = [username];
+    for (var i = 1; i < n - 1; i++) marker.push('');
+    newRows = [marker.concat([new Date()])];
+  }
+  var all = keep.concat(newRows);
+  if (last > 1) sheet.getRange(2, 1, last - 1, n).clearContent();
+  sheet.getRange(2, 1, all.length, n - 1).setNumberFormat('@');
+  sheet.getRange(2, 1, all.length, n).setValues(all);
+}
+
+function readQuestions_(username) {
+  var rows = userRows_(Q_SHEET_NAME, Q_HEADERS, username);
+  if (!rows) return null;
+  return rows.filter(function (r) { return r[1] !== ''; }).map(function (r) {
+    return {
       id: String(r[1]), exam: String(r[2]), sectionId: String(r[3]), sectionName: String(r[4]),
       question: String(r[5]), code: String(r[6]), correct: String(r[7]),
       option2: String(r[8]), option3: String(r[9]), option4: String(r[10]),
       explanation: String(r[11]), seenInExam: r[12] === true || r[12] === 'TRUE'
-    });
+    };
   });
-  return any ? out : null;
 }
 
-/* Replace all of one user's rows with the given ones, keeping everyone else's. */
-function writeQuestions_(username, newRows) {
-  var sheet = getQuestionSheet_();
-  var last = sheet.getLastRow();
-  var keep = last > 1 ? sheet.getRange(2, 1, last - 1, Q_HEADERS.length).getValues()
-    .filter(function (r) { return String(r[0]) !== username; })
-    .map(function (r) { return r.map(function (v, i) { return i < Q_HEADERS.length - 2 ? text_(String(v)) : v; }); }) : [];
-  // An empty bank still gets one marker row so a later load knows the bank is empty rather than never saved.
-  if (!newRows.length) newRows = [[username, '', '', '', '', '', '', '', '', '', '', '', false, new Date()]];
-  var all = keep.concat(newRows);
-  if (last > 1) sheet.getRange(2, 1, last - 1, Q_HEADERS.length).clearContent();
-  sheet.getRange(2, 1, all.length, Q_HEADERS.length - 2).setNumberFormat('@');
-  sheet.getRange(2, 1, all.length, Q_HEADERS.length).setValues(all);
+function readNotes_(username) {
+  var rows = userRows_(N_SHEET_NAME, N_HEADERS, username);
+  if (!rows) return null;
+  return rows.filter(function (r) { return r[1] !== ''; }).map(function (r) {
+    return {
+      headingId: String(r[1]), heading: String(r[2]), subId: String(r[3]), subheading: String(r[4]),
+      order: Number(r[5]) || 0, body: String(r[6]), images: parse_(r[7], [])
+    };
+  });
 }
 
 function questionRow_(username, q, updated) {
   q = q || {};
-  var cells = [username, q.id, q.exam, q.sectionId, q.sectionName, q.question, q.code,
-               q.correct, q.option2, q.option3, q.option4, q.explanation].map(function (v) {
+  var cells = textCells_([username, q.id, q.exam, q.sectionId, q.sectionName, q.question, q.code,
+                          q.correct, q.option2, q.option3, q.option4, q.explanation]);
+  if (!cells[1]) throw new Error('Question without an id');
+  return cells.concat([q.seenInExam === true ? 'TRUE' : 'FALSE', new Date(updated)]);
+}
+
+function noteRow_(username, n, updated) {
+  n = n || {};
+  var cells = textCells_([username, n.headingId, n.heading, n.subId, n.subheading, String(Number(n.order) || 0),
+                          n.body, JSON.stringify(Array.isArray(n.images) ? n.images : [])]);
+  if (!cells[1]) throw new Error('Note without a heading id');
+  return cells.concat([new Date(updated)]);
+}
+
+function textCells_(values) {
+  return values.map(function (v) {
     v = String(v == null ? '' : v);
-    if (v.length > MAX_CELL) throw new Error('A question field is too long for one cell');
+    if (v.length > MAX_CELL) throw new Error('A field is too long for one cell (' + v.length + ' characters)');
     return text_(v);
   });
-  if (!cells[1]) throw new Error('Question without an id');
-  return cells.concat([q.seenInExam === true, new Date(updated)]);
 }
 
 /* A leading = + - @ would make Sheets treat user text as a formula. */
 function text_(v) {
   return /^[=+\-@]/.test(v) ? "'" + v : v;
 }
+
+/* ---------- helpers ---------- */
 
 function findRow_(sheet, username) {
   var last = sheet.getLastRow();
@@ -196,8 +290,9 @@ function numOrBlank_(n) {
   return typeof n === 'number' && n >= 0 ? n : '';
 }
 
+/* v tells the quiz what this script supports: 2 = Questions tab, 3 = Notes tab, pictures, group dashboard. */
 function json_(obj) {
-  obj.v = 2; // tells the quiz this script stores questions in the Questions tab
+  obj.v = 3;
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
