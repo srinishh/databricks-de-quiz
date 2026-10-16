@@ -25,6 +25,13 @@ The first time someone saves a question to their question bank, the script also 
 
 Each user's question bank is private to their username. Whenever someone adds, edits or deletes a question, the quiz replaces that user's rows.
 
+Notes get a `Notes` tab the same way, with one row per subheading (or one per heading that has no subheadings yet):
+
+| Username | HeadingId | Heading | SubheadingId | Subheading | Order | Body | Images | Updated |
+|---|---|---|---|---|---|---|---|---|
+
+Pictures added to notes are saved in a Google Drive folder called **Lakehouse Quiz Images**, in the account that owns the script. Each picture is shared as "anyone with the link can view" so the quiz can show it. The `Images` column holds the Drive file IDs. Which questions are tagged to which note is part of `State`.
+
 ## 2. Paste the Apps Script
 
 1. In the sheet, open **Extensions → Apps Script**.
@@ -40,7 +47,7 @@ Each user's question bank is private to their username. Whenever someone adds, e
    - **Execute as**: **Me**
    - **Who has access**: **Anyone**
 4. Click **Deploy**.
-5. Google asks you to authorize the script. Click **Authorize access** and pick your account. If you see *"Google hasn't verified this app"*, click **Advanced → Go to Quiz Progress API (unsafe)**; this is your own script. Then click **Allow**. The script can only read and write this spreadsheet.
+5. Google asks you to authorize the script. Click **Authorize access** and pick your account. If you see *"Google hasn't verified this app"*, click **Advanced → Go to Quiz Progress API (unsafe)**; this is your own script. Then click **Allow**. The script asks for two permissions: this spreadsheet, and Google Drive (to save pictures added to notes into its own folder).
 6. Copy the **Web app URL**. It looks like `https://script.google.com/macros/s/AKfy.../exec`.
 
 ## 4. Put the URL in the quiz
@@ -67,7 +74,7 @@ Save, commit and redeploy the quiz. The footer of the home screen now says progr
 
 ## Updating the script later
 
-> **Already deployed an earlier version?** The question bank tab needs the latest `Code.gs`. Paste it over the old code, save, and redeploy as a new version as described below. Your Web App URL stays the same, and each user's existing questions move into the `Questions` tab the next time they open the quiz.
+> **Already deployed an earlier version?** The `Questions` and `Notes` tabs, pictures and the group dashboard all need the latest `Code.gs`. Paste it over the old code, save, and redeploy as a new version as described below. Your Web App URL stays the same. Because pictures are stored in Drive, Google asks you to authorize the script again during the redeploy: click **Review permissions** and allow access. Existing questions and notes move into their tabs the next time each user opens the quiz.
 
 
 If you change `Code.gs`, use **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy**. This keeps the same URL. *New deployment* would create a new URL that you'd have to paste into `index.html` again.
@@ -84,4 +91,6 @@ If you change `Code.gs`, use **Deploy → Manage deployments → ✏️ Edit →
 - **No password.** Anyone who knows the Web App URL and a username can read or overwrite that user's progress. That's fine for study progress. Don't store anything sensitive.
 - **Cell size.** One cell holds at most 50,000 characters. Questions are stored one per row, so this limit only applies to a single very long field.
 - **Editing questions in the sheet.** You can read the `Questions` tab freely. Edits made there are overwritten the next time that user changes their question bank in the quiz, and a device that already has the user's progress may not pick them up.
+- **Group dashboard.** Everyone using the quiz can see every username's progress: answers, scores per section, best mock exam and last active time. Notes and question text are never shown there.
+- **Pictures.** Anyone with a picture's link can view it, and the upload endpoint accepts images from anyone who has the Web App URL (JPEG, PNG, WebP or GIF, up to about 3 MB each; the quiz shrinks pictures before sending). Pictures removed from a note stay in the Drive folder; delete them there if you want the space back.
 - **Apps Script quotas.** The free quotas cover a study group with plenty of room. Each save is one request, sent at most once every couple of seconds while someone answers questions.

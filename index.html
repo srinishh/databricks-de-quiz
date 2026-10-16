@@ -174,6 +174,64 @@ pre.code code{background:none;color:inherit;padding:0;font-size:inherit}
 .userbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:14px;font-size:.92rem}
 .ok-note{color:var(--good);font-size:.92rem;font-weight:700}
 
+/* notes */
+.ntag{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:2px solid var(--edge);background:var(--violet);color:var(--on);border-radius:99px;padding:3px 12px;font-size:.84rem;font-weight:700;box-shadow:2px 2px 0 var(--edge);text-align:left;overflow-wrap:anywhere}
+.ntag:hover{background:var(--code-bg);color:var(--code-ink)}
+.ntag.empty{background:var(--surface);color:var(--ink);font-weight:600}
+.tagrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:12px}
+.tagpanel{margin-top:12px;padding:12px 14px;border:2px dashed var(--edge);border-radius:14px;background:var(--bg)}
+.tagpanel .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0 12px}
+.ntoc{margin-top:18px;padding:12px 16px;border:2px solid var(--edge);border-radius:14px;background:var(--surface);box-shadow:3px 3px 0 var(--edge)}
+.ntoc ul{list-style:none;margin:6px 0 0;padding:0}
+.ntoc ul ul{margin:2px 0 4px 16px}
+.ntoc button{background:none;border:0;padding:3px 0;text-align:left;color:var(--ink);font-weight:600;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.ntoc ul ul button{font-weight:500;color:var(--muted)}
+.ntoc button:hover{color:var(--pink)}
+.nhead{margin-top:30px;scroll-margin-top:20px}
+.nhead>.hrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px 14px;flex-wrap:wrap;border-bottom:3px solid var(--edge);padding-bottom:6px}
+.nhead h2{font-size:1.5rem}
+.note{margin-top:14px;padding:14px 16px;background:var(--surface);border:2px solid var(--edge);border-radius:16px;box-shadow:4px 4px 0 var(--edge);scroll-margin-top:20px}
+.note h3{font-size:1.1rem;font-weight:800}
+.nbody{margin-top:8px;overflow-wrap:anywhere}
+.nbody p+p,.nbody ul{margin-top:8px}
+.nbody ul{padding-left:20px}
+.nimgs{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.nimgs a,.nimgs .ed{display:block;border:2px solid var(--edge);border-radius:10px;overflow:hidden;background:var(--bg);position:relative}
+.nimgs img{display:block;max-height:220px;max-width:100%;width:auto}
+.nimgs .ed img{max-height:120px}
+.nimgs .ed button{position:absolute;top:4px;right:4px;border:2px solid var(--edge);background:var(--pink);color:var(--on);border-radius:8px;font-size:.75rem;font-weight:700;padding:0 6px}
+.nacts{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px}
+.nq{margin-top:10px;font-size:.9rem}
+.nq summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.nq li{margin-top:6px}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%,30%{box-shadow:0 0 0 5px var(--yellow),4px 4px 0 var(--edge)}100%{box-shadow:4px 4px 0 var(--edge)}}
+.overlay{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 72px max(16px,env(safe-area-inset-left,0px))}
+.overlay .closebar{position:sticky;top:-24px;z-index:1;display:flex;justify-content:flex-end;padding:10px 0;background:var(--bg)}
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:24px}
+.kpi{padding:12px 14px;background:var(--surface);border:2px solid var(--edge);border-radius:14px;box-shadow:3px 3px 0 var(--edge)}
+.kpi b{display:block;font-family:var(--display);font-size:1.9rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi span{font-size:.84rem;color:var(--muted)}
+.insights{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.insights li{padding:10px 14px;background:var(--surface);border:2px solid var(--edge);border-left-width:8px;border-radius:12px}
+.panel{margin-top:14px;background:var(--surface);border:2px solid var(--edge);border-radius:16px;box-shadow:4px 4px 0 var(--edge);overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:.9rem}
+.dt th,.dt td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.dt th{font-size:.74rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:500}
+.dt tr:last-child td{border-bottom:0}
+.dt td.n,.dt th.n{text-align:right;font-variant-numeric:tabular-nums}
+.dt tr.me td{background:var(--code-bg);color:var(--code-ink)}
+.mbar{display:inline-block;vertical-align:middle;width:70px;height:8px;margin-right:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--blue);border-radius:0 4px 4px 0}
+.heat td.h{text-align:center;font-variant-numeric:tabular-nums;font-size:.82rem;border:2px solid var(--surface);border-radius:6px;min-width:52px}
+.heat th.c{text-align:center}
+.legend{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.82rem;color:var(--muted)}
+.legend .ramp{width:140px;height:10px;border-radius:5px;background:linear-gradient(90deg,color-mix(in srgb,var(--blue) 6%,var(--surface)),var(--blue))}
+.sbars{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:10px 14px;align-items:center;padding:14px 16px}
+.sbars .track{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.sbars .track i{display:block;height:100%;background:var(--blue);border-radius:0 4px 4px 0}
+.sbars .v{font-family:var(--mono);font-size:.82rem;font-variant-numeric:tabular-nums;text-align:right}
 /* group progress */
 .grow{border-bottom:2px dashed var(--line)}
 .grow summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer;list-style:none;padding:13px 0}
@@ -744,7 +802,7 @@ function readJSON(k){try{var v=JSON.parse(localStorage.getItem(k));return v&&typ
 function writeJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function load(){return readJSON(KEY)||{}}
 var store=HOSTED?load():{};
-function norm(){store.stats=store.stats||{};store.history=store.history||[];store.custom=Array.isArray(store.custom)?store.custom:[];store.exam=store.exam||{};store.custom.forEach(function(c){if(c&&SECMAP[c.s])c.s=SECMAP[c.s]})}
+function norm(){store.notes=Array.isArray(store.notes)?store.notes:[];store.tags=store.tags&&typeof store.tags==="object"?store.tags:{};store.stats=store.stats||{};store.history=store.history||[];store.custom=Array.isArray(store.custom)?store.custom:[];store.exam=store.exam||{};store.custom.forEach(function(c){if(c&&SECMAP[c.s])c.s=SECMAP[c.s]})}
 norm();
 function inExam(q){for(var i=0;i<SECTIONS.length;i++){if(SECTIONS[i].id===q.s)return true}return false}
 function all(){return QUESTIONS.concat(store.custom.filter(function(q){return SEC[q.s]&&q.q&&Array.isArray(q.o)&&q.o.length>=2})).filter(inExam)}
@@ -808,7 +866,7 @@ function flush(){
     .catch(function(){syncState="error";setNote()})
     .then(function(){writing=false});
 }
-function hasContent(){return Object.keys(store.stats).length||store.history.length||store.custom.length||Object.keys(store.exam).length}
+function hasContent(){return Object.keys(store.stats).length||store.history.length||store.custom.length||Object.keys(store.exam).length||store.notes.length}
 function connect(){
   if(!(window.claude&&window.claude.use))return;
   Promise.all([window.claude.use("db"),window.claude.use("user"),window.claude.use("room")]).then(function(r){
@@ -921,6 +979,8 @@ function home(){
       '<button class="mode" style="--c:var(--cyan)" id="m-missed" type="button"><strong>Revisit missed</strong><span>'+missed+' question'+(missed===1?'':'s')+' you got wrong last time, within selected sections.</span><span class="go">START &rarr;</span></button>'+
       '<button class="mode" style="--c:var(--lime)" id="m-repeat" type="button"><strong>Exam repeats</strong><span>'+flagged+' question'+(flagged===1?'':'s')+' you marked as seen in the real exam.</span><span class="go">START &rarr;</span></button>'+
       '<button class="mode" style="--c:var(--orange)" id="m-bank" type="button"><strong>Question bank</strong><span>Add your own questions ('+mine+' so far), search all '+total+', mark exam repeats.</span><span class="go">OPEN &rarr;</span></button>'+
+      '<button class="mode" style="--c:var(--violet)" id="m-notes" type="button"><strong>Notes</strong><span>'+store.notes.length+' heading'+(store.notes.length===1?'':'s')+'. Write notes with pictures and tag questions to them.</span><span class="go">OPEN &rarr;</span></button>'+
+      '<button class="mode" style="--c:var(--mint)" id="m-dash" type="button"><strong>Group dashboard</strong><span>See how everyone is doing: leaderboard, section mastery and insights.</span><span class="go">OPEN &rarr;</span></button>'+
     '</div>'+
     '<p class="err" id="err" role="alert"></p>'+
     (hist?'<h2 style="margin-top:28px">Recent rounds</h2><ul class="hist">'+hist+'</ul>':'')+
@@ -937,6 +997,8 @@ function home(){
   document.getElementById("m-exam").onclick=startExam;
   document.getElementById("m-bank").onclick=function(){bankTab="browse";editing=null;bank()};
   var so=document.getElementById("signout");if(so)so.onclick=signOut;
+  document.getElementById("m-notes").onclick=function(){noteDraft=null;noteRename=null;notesPage()};
+  document.getElementById("m-dash").onclick=function(){dash(true)};
   
   var r=document.getElementById("reset");
   if(r){var armed=false;r.onclick=function(){
@@ -1025,6 +1087,7 @@ function quiz(){
     '<button type="button" class="flag" id="flag" aria-pressed="'+(!!store.exam[it.q.id])+'"><span class="box">'+(store.exam[it.q.id]?"\u2713":"")+'</span>Came up in my exam</button></div>'+
     '<h2 class="qtext">'+fmt(it.q.q)+'</h2>'+
     (it.q.c?'<pre class="code"><code>'+esc(it.q.c)+'</code></pre>':'')+
+    tagControl(it.q)+
     '<div class="opts" role="group" aria-label="Answer options">'+optsHtml+'</div>'+
     '<div class="fb" aria-live="polite">'+fb+'</div>'+
     '<div class="actions"><button class="btn primary" id="next" type="button"'+(canNext?'':' disabled')+'>'+nextLabel+'</button>'+
@@ -1055,8 +1118,13 @@ function next(){
   ses.i+=1;ses.quit=false;quiz();
   window.scrollTo(0,0);
 }
+app.addEventListener("click",function(e){
+  if(view!=="quiz"&&view!=="result")return;
+  var b=e.target.closest("button");if(b)tagClick(b,quiz);
+});
 document.addEventListener("keydown",function(e){
-  if(view!=="quiz"||!ses||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(view!=="quiz"||!ses||overlayEl||e.metaKey||e.ctrlKey||e.altKey)return;
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
   var k=e.key.toLowerCase(),idx=["a","b","c","d","1","2","3","4"].indexOf(k);
   if(idx>=0){var i=idx%4;if(i<ses.items[ses.i].opts.length)choose(i);return}
   if(k==="n"||k==="arrowright")next();
@@ -1096,7 +1164,9 @@ function finish(){
       (it.q.c?'<pre class="code"><code>'+esc(it.q.c)+'</code></pre>':'')+
       '<p class="ans"><b class="badc">Your answer:</b> '+(it.pick===null?'not answered':fmt(it.opts[it.pick].t))+'</p>'+
       '<p class="ans"><b class="good">Correct answer:</b> '+fmt(correct.t)+'</p>'+
-      '<p class="ans">'+fmt(it.q.e)+'</p></div></details>';
+      '<p class="ans">'+fmt(it.q.e)+'</p>'+
+      (tagOf(it.q.id)?'<div class="tagrow"><button type="button" class="ntag" data-ntagopen="'+it.q.id+'">📝 '+esc(tagOf(it.q.id).label)+'</button></div>':'')+
+      '</div></details>';
   }).join("");
 
   var secs=Math.floor((Date.now()-ses.t0)/1000);
@@ -1118,7 +1188,7 @@ function qRow(q){
   var on=!!store.exam[q.id];
   var act='<button type="button" class="flag" data-flag="'+q.id+'" aria-pressed="'+on+'"><span class="box">'+(on?"\u2713":"")+'</span>Came up in my exam</button>';
   if(q.custom){act+='<button type="button" class="btn link" data-edit="'+q.id+'">Edit</button><button type="button" class="btn link" data-del="'+q.id+'">'+(delArm===q.id?"Sure? Delete":"Delete")+'</button>'}
-  return '<div class="qrow"><span class="meta">'+esc(SEC[q.s]?SEC[q.s].name:q.s)+(q.custom?'<span class="tag">yours</span>':'')+'</span><span class="qt">'+fmt(q.q)+'</span><span class="rowact">'+act+'</span></div>';
+  return '<div class="qrow"><span class="meta">'+esc(SEC[q.s]?SEC[q.s].name:q.s)+(q.custom?'<span class="tag">yours</span>':'')+'</span><span class="qt">'+fmt(q.q)+'</span><span class="rowact">'+act+'</span>'+tagControl(q)+'</div>';
 }
 function secOptions(sel,withAll){
   return (withAll?'<option value="">All sections</option>':'')+SECTIONS.map(function(s){return '<option value="'+s.id+'"'+(s.id===sel?' selected':'')+'>'+esc(s.name)+'</option>'}).join("");
@@ -1217,6 +1287,7 @@ function saveForm(){
 app.addEventListener("click",function(e){
   if(view!=="bank")return;
   var b=e.target.closest("button");if(!b)return;
+  if(tagClick(b,fillList))return;
   if(b.id==="back"){editing=null;home();return}
   if(b.hasAttribute("data-tab")){
     var t=b.getAttribute("data-tab");
@@ -1312,6 +1383,410 @@ function group(){
   });
 }
 
+/* ---------- notes ----------
+   store.notes = [{id, t, subs:[{id, t, b, imgs:[{d:driveFileId} | {src:dataUrl}]}]}]
+   store.tags[questionId] = {h:headingId, s:subheadingId or ""} */
+function nid(p){return p+Date.now().toString(36)+Math.floor(Math.random()*46656).toString(36)}
+function findHeading(id){for(var i=0;i<store.notes.length;i++)if(store.notes[i].id===id)return store.notes[i];return null}
+function findSub(h,id){if(!h)return null;for(var i=0;i<h.subs.length;i++)if(h.subs[i].id===id)return h.subs[i];return null}
+/* The tag of a question, if it still points at an existing heading. */
+function tagOf(qid){
+  var t=store.tags[qid];if(!t)return null;
+  var h=findHeading(t.h);if(!h)return null;
+  var sb=t.s?findSub(h,t.s):null;
+  return {h:h,s:sb,label:h.t+(sb?" › "+sb.t:"")};
+}
+function questionById(id){var Q=QUESTIONS.concat(store.custom);for(var i=0;i<Q.length;i++)if(Q[i].id===id)return Q[i];return null}
+function taggedTo(hid,sid){
+  return Object.keys(store.tags).filter(function(q){var t=store.tags[q];return t.h===hid&&(t.s||"")===(sid||"")})
+    .map(questionById).filter(Boolean);
+}
+/* Sheet rows: one per subheading, or one per heading that has none. */
+function toSheetNotes(notes){
+  var rows=[],order=0;
+  notes.forEach(function(h){
+    if(!h.subs.length)rows.push({headingId:h.id,heading:h.t,subId:"",subheading:"",order:order++,body:"",images:[]});
+    h.subs.forEach(function(sb){
+      rows.push({headingId:h.id,heading:h.t,subId:sb.id,subheading:sb.t,order:order++,body:sb.b||"",
+        images:(sb.imgs||[]).filter(function(im){return im.d})});
+    });
+  });
+  return rows;
+}
+function fromSheetNotes(rows){
+  var out=[],byId={};
+  rows.slice().sort(function(a,b){return a.order-b.order}).forEach(function(r){
+    var h=byId[r.headingId];
+    if(!h){h=byId[r.headingId]={id:r.headingId,t:r.heading,subs:[]};out.push(h)}
+    if(r.subId)h.subs.push({id:r.subId,t:r.subheading,b:r.body||"",imgs:Array.isArray(r.images)?r.images:[]});
+  });
+  return out;
+}
+/* Small markdown: blank line = paragraph, "- " = bullet, `code`, **bold**. */
+function noteHtml(b){
+  return String(b||"").split(/\n\s*\n/).map(function(block){
+    var lines=block.split("\n");
+    var inl=function(t){return fmt(t).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>")};
+    if(lines.every(function(l){return /^\s*[-*] /.test(l)||!l.trim()}))
+      return '<ul>'+lines.filter(function(l){return l.trim()}).map(function(l){return '<li>'+inl(l.replace(/^\s*[-*] /,""))+'</li>'}).join("")+'</ul>';
+    return '<p>'+lines.map(inl).join("<br>")+'</p>';
+  }).join("");
+}
+function imgSrc(im){
+  if(im.d&&/^[\w-]+$/.test(im.d))return "https://drive.google.com/thumbnail?id="+im.d+"&sz=w1600";
+  if(im.src&&/^data:image\//.test(im.src))return im.src;
+  return "";
+}
+function imgHtml(im,editIdx){
+  var src=imgSrc(im);if(!src)return "";
+  var fb=im.d?' onerror="this.onerror=null;this.src=\'https://lh3.googleusercontent.com/d/'+im.d+'\'"':'';
+  var img='<img src="'+esc(src)+'" alt="Notes picture" loading="lazy"'+fb+'>';
+  if(editIdx!=null)return '<span class="ed">'+img+'<button type="button" data-nimgdel="'+editIdx+'" aria-label="Remove picture">Remove</button></span>';
+  var href=im.d?"https://drive.google.com/file/d/"+im.d+"/view":src;
+  return '<a href="'+esc(href)+'" target="_blank" rel="noopener">'+img+'</a>';
+}
+
+var noteDraft=null,noteRename=null,noteMsg="",overlayEl=null;
+/* Renders the notes into `root`; `inOverlay` hides things that would leave a running quiz. */
+function renderNotes(root,inOverlay){
+  var N=store.notes;
+  var toc=N.length?'<nav class="ntoc" aria-label="Notes contents"><span class="label">Contents</span><ul>'+N.map(function(h){
+    return '<li><button type="button" data-ngo="nh-'+h.id+'">'+esc(h.t)+'</button>'+
+      (h.subs.length?'<ul>'+h.subs.map(function(sb){return '<li><button type="button" data-ngo="ns-'+sb.id+'">'+esc(sb.t)+'</button></li>'}).join("")+'</ul>':'')+'</li>';
+  }).join("")+'</ul></nav>':'';
+  function qlist(qs){
+    if(!qs.length)return "";
+    return '<details class="nq"><summary>'+qs.length+' tagged question'+(qs.length===1?'':'s')+'</summary><ul>'+
+      qs.map(function(q){return '<li>'+fmt(q.q)+'</li>'}).join("")+'</ul>'+
+      (inOverlay?'':'<button type="button" class="btn link" data-npractice="'+esc(qs.map(function(q){return q.id}).join(","))+'">Practice these</button>')+'</details>';
+  }
+  var body=N.map(function(h){
+    var head=noteRename===h.id?
+      '<div class="field" style="margin:0;flex:1 1 240px"><label for="nr-t">Heading</label><input type="text" id="nr-t" value="'+esc(h.t)+'" maxlength="120"></div>'+
+      '<span class="nacts"><button type="button" class="btn primary" data-nrsave="'+h.id+'">Save</button><button type="button" class="btn link" data-nrcancel="1">Cancel</button></span>':
+      '<h2>'+esc(h.t)+'</h2><span class="nacts"><button type="button" class="btn link" data-nrename="'+h.id+'">Rename</button>'+
+      '<button type="button" class="btn link" data-naddsub="'+h.id+'">Add subheading</button>'+
+      '<button type="button" class="btn link" data-ndelh="'+h.id+'">'+(noteRename==="del:"+h.id?"Sure? Delete heading":"Delete")+'</button></span>';
+    var subs=h.subs.map(function(sb){
+      if(noteDraft&&noteDraft.s===sb.id)return '<article class="note" id="ns-'+sb.id+'">'+draftForm()+'</article>';
+      return '<article class="note" id="ns-'+sb.id+'"><h3>'+esc(sb.t)+'</h3>'+
+        (sb.b?'<div class="nbody">'+noteHtml(sb.b)+'</div>':'<p class="small" style="margin-top:6px">No notes yet.</p>')+
+        ((sb.imgs||[]).length?'<div class="nimgs">'+sb.imgs.map(function(im){return imgHtml(im)}).join("")+'</div>':'')+
+        qlist(taggedTo(h.id,sb.id))+
+        '<div class="nacts"><button type="button" class="btn link" data-nedit="'+h.id+'|'+sb.id+'">Edit</button>'+
+        '<button type="button" class="btn link" data-ndels="'+h.id+'|'+sb.id+'">'+(noteRename==="del:"+sb.id?"Sure? Delete":"Delete")+'</button></div></article>';
+    }).join("");
+    var own=taggedTo(h.id,"");
+    return '<section class="nhead" id="nh-'+h.id+'"><div class="hrow">'+head+'</div>'+
+      (own.length?'<div class="note">'+qlist(own)+'</div>':'')+subs+
+      (!h.subs.length&&!own.length?'<p class="small" style="margin-top:10px">No subheadings yet.</p>':'')+'</section>';
+  }).join("");
+  root.innerHTML=
+    (inOverlay?'':'<button class="btn link" id="back" type="button">&larr; Back</button>')+
+    '<h1 style="font-size:clamp(1.9rem,7vw,2.8rem);margin-top:8px">Notes</h1>'+
+    '<p class="lede">Organise what you learn under headings and subheadings. Tag questions to a section while you practise and jump straight here from the question. Add pictures to any subheading.</p>'+
+    toc+body+
+    '<div class="actions"><button type="button" class="btn primary" data-naddh="1">Add heading</button><span class="ok-note" role="status">'+esc(noteMsg)+'</span></div>';
+  noteMsg="";
+}
+function draftForm(){
+  var d=noteDraft;
+  return '<div class="field" style="margin-top:0"><label for="nd-t">Subheading</label><input type="text" id="nd-t" value="'+esc(d.t)+'" maxlength="120"></div>'+
+    '<div class="field"><label for="nd-b">Notes</label><textarea id="nd-b" rows="8" placeholder="Blank line = new paragraph. Start a line with - for a bullet. `code` and **bold** work. Paste a picture here to add it.">'+esc(d.b)+'</textarea></div>'+
+    '<div class="field"><span class="lbl">Pictures</span><div class="nimgs" id="nd-imgs">'+d.imgs.map(function(im,i){return imgHtml(im,i)}).join("")+'</div>'+
+    '<div><label class="btn" style="display:inline-block;cursor:pointer">Add picture<input type="file" id="nd-file" accept="image/*" hidden></label> <span class="small" id="nd-up" role="status"></span></div></div>'+
+    '<div class="actions" style="margin-top:16px"><button type="button" class="btn primary" data-nsave="1">Save</button><button type="button" class="btn link" data-ncancel="1">Cancel</button></div>'+
+    '<p class="err" id="nd-err" role="alert"></p>';
+}
+function notesRoot(){return overlayEl?overlayEl.querySelector("#nroot"):(view==="notes"?app:null)}
+function rerenderNotes(focus){var r=notesRoot();if(!r)return;renderNotes(r,!!overlayEl);bindDraft();if(focus)goNote(focus)}
+function goNote(id){
+  var el=document.getElementById(id);if(!el)return;
+  el.scrollIntoView({block:"start"});
+  var card=el.classList.contains("note")?el:el.querySelector(".hrow");
+  if(card){card.classList.remove("flash");void card.offsetWidth;card.classList.add("flash")}
+}
+function notesPage(focus){
+  stopTimer();view="notes";ses=null;closeNotes();
+  renderNotes(app,false);bindDraft();
+  if(focus)goNote(focus);else window.scrollTo(0,0);
+}
+/* Open the notes on top of the current screen (keeps a running quiz and its timer untouched). */
+function openNotes(focus){
+  closeNotes();
+  overlayEl=document.createElement("div");
+  overlayEl.className="overlay";overlayEl.setAttribute("role","dialog");overlayEl.setAttribute("aria-label","Notes");
+  overlayEl.innerHTML='<div class="wrap"><div class="closebar"><button type="button" class="btn" data-nclose="1">Close notes</button></div><div id="nroot"></div></div>';
+  document.body.appendChild(overlayEl);
+  document.body.style.overflow="hidden";
+  overlayEl.addEventListener("click",notesClick);
+  rerenderNotes(focus);
+  overlayEl.querySelector("[data-nclose]").focus({preventScroll:true});
+  if(focus)goNote(focus);
+}
+function closeNotes(){
+  if(!overlayEl)return;
+  overlayEl.remove();overlayEl=null;noteDraft=null;noteRename=null;document.body.style.overflow="";
+  if(view==="quiz")quiz();else if(view==="bank")bank();
+}
+function noteTarget(qid){var t=tagOf(qid);return t?(t.s?"ns-"+t.s.id:"nh-"+t.h.id):null}
+function bindDraft(){
+  if(!noteDraft)return;
+  var t=document.getElementById("nd-t"),b=document.getElementById("nd-b"),f=document.getElementById("nd-file");
+  if(!t)return;
+  t.oninput=function(){noteDraft.t=t.value};
+  b.oninput=function(){noteDraft.b=b.value};
+  f.onchange=function(){if(f.files&&f.files[0])addPicture(f.files[0]);f.value=""};
+  b.addEventListener("paste",function(e){
+    var items=(e.clipboardData&&e.clipboardData.files)||[];
+    for(var i=0;i<items.length;i++)if(/^image\//.test(items[i].type)){e.preventDefault();addPicture(items[i]);return}
+  });
+}
+function drawImgs(){var el=document.getElementById("nd-imgs");if(el&&noteDraft)el.innerHTML=noteDraft.imgs.map(function(im,i){return imgHtml(im,i)}).join("")}
+/* Shrink a picture in the browser before storing it. Resolves to {mime, data (base64), url}. */
+function shrinkImage(file,maxSide,quality){
+  return new Promise(function(resolve,reject){
+    var url=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){
+      var k=Math.min(1,maxSide/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k);
+      var c=document.createElement("canvas");c.width=w;c.height=h;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      var du=c.toDataURL("image/jpeg",quality);
+      resolve({mime:"image/jpeg",data:du.split(",")[1],url:du});
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);reject(new Error("That file could not be read as a picture."))};
+    img.src=url;
+  });
+}
+function addPicture(file){
+  var st=document.getElementById("nd-up"),err=document.getElementById("nd-err"),d=noteDraft;
+  if(!d)return;
+  if(err)err.textContent="";
+  if(localUser&&SHEETS_URL&&sheetV>0&&sheetV<3){if(err)err.textContent="Pictures need the latest Apps Script. Redeploy it as described in SHEETS_SETUP.md.";return}
+  if(st)st.textContent="Adding picture...";
+  var cloud=localUser&&SHEETS_URL;
+  shrinkImage(file,cloud?1600:1000,cloud?0.85:0.72).then(function(img){
+    if(!cloud)return {src:img.url};
+    return uploadImage(localUser,file.name,img).then(function(id){return {d:id}});
+  }).then(function(im){
+    if(noteDraft!==d)return;
+    d.imgs.push(im);drawImgs();if(st)st.textContent="";
+  }).catch(function(e){
+    if(st)st.textContent="";
+    var el=document.getElementById("nd-err");if(el)el.textContent="Could not add the picture: "+(e&&e.message||e);
+  });
+}
+function uploadImage(username,name,img){
+  return fetch(SHEETS_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"upload",username:username,name:name,mime:img.mime,data:img.data})})
+    .then(function(r){return r.json()})
+    .then(function(j){sheetV=+j.v||1;if(!j.ok)throw new Error(j.error||"upload failed");return j.id});
+}
+function notesClick(e){
+  var b=e.target.closest("button");if(!b)return;
+  var a=function(n){return b.getAttribute(n)};
+  if(a("data-nclose")){closeNotes();return}
+  if(b.id==="back"&&view==="notes"){noteDraft=null;noteRename=null;home();return}
+  if(a("data-ngo")){goNote(a("data-ngo"));return}
+  if(a("data-npractice")){
+    var ids=a("data-npractice").split(","),qs=ids.map(questionById).filter(Boolean);
+    noteDraft=null;noteRename=null;if(qs.length)begin("Notes practice",shuffle(qs));return;
+  }
+  if(a("data-naddh")){
+    var h={id:nid("h"),t:"New heading",subs:[]};store.notes.push(h);save();
+    noteRename=h.id;noteDraft=null;rerenderNotes("nh-"+h.id);
+    var r=document.getElementById("nr-t");if(r){r.focus();r.select()}
+    return;
+  }
+  if(a("data-nrename")){noteRename=a("data-nrename");noteDraft=null;rerenderNotes();var r2=document.getElementById("nr-t");if(r2){r2.focus();r2.select()}return}
+  if(a("data-nrcancel")){noteRename=null;rerenderNotes();return}
+  if(a("data-nrsave")){
+    var hh=findHeading(a("data-nrsave")),v=(document.getElementById("nr-t").value||"").trim();
+    if(hh&&v){hh.t=v;save()}
+    noteRename=null;rerenderNotes(hh?"nh-"+hh.id:null);return;
+  }
+  if(a("data-ndelh")){
+    var id=a("data-ndelh");
+    if(noteRename!=="del:"+id){noteRename="del:"+id;rerenderNotes();return}
+    store.notes=store.notes.filter(function(x){return x.id!==id});
+    Object.keys(store.tags).forEach(function(q){if(store.tags[q].h===id)delete store.tags[q]});
+    noteRename=null;save();rerenderNotes();return;
+  }
+  if(a("data-naddsub")){
+    var h2=findHeading(a("data-naddsub"));if(!h2)return;
+    var sb={id:nid("s"),t:"New subheading",b:"",imgs:[]};h2.subs.push(sb);save();
+    noteDraft={h:h2.id,s:sb.id,t:sb.t,b:"",imgs:[]};noteRename=null;rerenderNotes("ns-"+sb.id);
+    var t=document.getElementById("nd-t");if(t){t.focus();t.select()}
+    return;
+  }
+  if(a("data-nedit")){
+    var p=a("data-nedit").split("|"),h3=findHeading(p[0]),s3=findSub(h3,p[1]);if(!s3)return;
+    noteDraft={h:h3.id,s:s3.id,t:s3.t,b:s3.b||"",imgs:(s3.imgs||[]).slice()};noteRename=null;rerenderNotes("ns-"+s3.id);return;
+  }
+  if(a("data-ndels")){
+    var p2=a("data-ndels").split("|"),h4=findHeading(p2[0]);if(!h4)return;
+    if(noteRename!=="del:"+p2[1]){noteRename="del:"+p2[1];rerenderNotes();return}
+    h4.subs=h4.subs.filter(function(x){return x.id!==p2[1]});
+    Object.keys(store.tags).forEach(function(q){if(store.tags[q].s===p2[1])store.tags[q].s=""});
+    noteRename=null;save();rerenderNotes("nh-"+h4.id);return;
+  }
+  if(a("data-nimgdel")!=null&&noteDraft){noteDraft.imgs.splice(+a("data-nimgdel"),1);drawImgs();return}
+  if(a("data-ncancel")){var sid=noteDraft&&noteDraft.s;noteDraft=null;rerenderNotes(sid?"ns-"+sid:null);return}
+  if(a("data-nsave")&&noteDraft){
+    var h5=findHeading(noteDraft.h),s5=findSub(h5,noteDraft.s);
+    if(s5){s5.t=noteDraft.t.trim()||s5.t;s5.b=noteDraft.b;s5.imgs=noteDraft.imgs.slice();save()}
+    var sid2=noteDraft.s;noteDraft=null;noteMsg="Saved.";rerenderNotes("ns-"+sid2);return;
+  }
+}
+app.addEventListener("click",function(e){if(view==="notes")notesClick(e)});
+document.addEventListener("keydown",function(e){if(overlayEl&&e.key==="Escape"&&!noteDraft)closeNotes()});
+
+/* Tag control shown on a question: the current tag (opens the notes there) and a small form to change it. */
+var tagOpen=null;
+function tagControl(q){
+  var t=tagOf(q.id);
+  var h='<div class="tagrow">'+(t?'<button type="button" class="ntag" data-ntagopen="'+q.id+'" title="Open these notes">📝 '+esc(t.label)+'</button>':'')+
+    '<button type="button" class="btn link" data-ntagedit="'+q.id+'">'+(t?'Change tag':'Tag to notes')+'</button></div>';
+  if(tagOpen!==q.id)return h;
+  var heads=store.notes.map(function(x){return '<option value="'+esc(x.t)+'">'}).join("");
+  var cur=t?t.h:null,subs=cur?cur.subs.map(function(x){return '<option value="'+esc(x.t)+'">'}).join(""):"";
+  return h+'<div class="tagpanel"><p class="small">Pick an existing heading and subheading, or type new ones.</p><div class="grid2">'+
+    '<div class="field"><label for="tg-h">Heading</label><input type="text" id="tg-h" list="tg-hl" maxlength="120" value="'+esc(t?t.h.t:"")+'" placeholder="e.g. Delta Lake"><datalist id="tg-hl">'+heads+'</datalist></div>'+
+    '<div class="field"><label for="tg-s">Subheading (optional)</label><input type="text" id="tg-s" list="tg-sl" maxlength="120" value="'+esc(t&&t.s?t.s.t:"")+'" placeholder="e.g. Time travel"><datalist id="tg-sl">'+subs+'</datalist></div></div>'+
+    '<div class="actions" style="margin-top:12px"><button type="button" class="btn primary" data-ntagsave="'+q.id+'">Save tag</button>'+
+    (t?'<button type="button" class="btn link" data-ntagdel="'+q.id+'">Remove tag</button>':'')+
+    '<button type="button" class="btn link" data-ntagcancel="1">Cancel</button></div></div>';
+}
+function byTitle(list,t){t=t.toLowerCase();for(var i=0;i<list.length;i++)if(list[i].t.toLowerCase()===t)return list[i];return null}
+/* Handles tag clicks on any screen; `redraw` re-renders that screen. Returns true when handled. */
+function tagClick(b,redraw){
+  var a=function(n){return b.getAttribute(n)};
+  if(a("data-ntagopen")){openNotes(noteTarget(a("data-ntagopen")));return true}
+  if(a("data-ntagedit")){tagOpen=a("data-ntagedit");redraw();var i=document.getElementById("tg-h");if(i)i.focus();return true}
+  if(a("data-ntagcancel")){tagOpen=null;redraw();return true}
+  if(a("data-ntagdel")){delete store.tags[a("data-ntagdel")];tagOpen=null;save();redraw();return true}
+  if(a("data-ntagsave")){
+    var qid=a("data-ntagsave"),ht=document.getElementById("tg-h").value.trim(),st=document.getElementById("tg-s").value.trim();
+    if(!ht){document.getElementById("tg-h").focus();return true}
+    var h=byTitle(store.notes,ht);
+    if(!h){h={id:nid("h"),t:ht,subs:[]};store.notes.push(h)}
+    var sb=null;
+    if(st){sb=byTitle(h.subs,st);if(!sb){sb={id:nid("s"),t:st,b:"",imgs:[]};h.subs.push(sb)}}
+    store.tags[qid]={h:h.id,s:sb?sb.id:""};
+    tagOpen=null;save();redraw();return true;
+  }
+  return false;
+}
+document.addEventListener("input",function(e){
+  /* keep the subheading suggestions in step with the heading typed */
+  if(e.target.id!=="tg-h")return;
+  var h=byTitle(store.notes,e.target.value.trim()),dl=document.getElementById("tg-sl");
+  if(dl)dl.innerHTML=h?h.subs.map(function(x){return '<option value="'+esc(x.t)+'">'}).join(""):"";
+});
+
+/* ---------- group dashboard ---------- */
+var ABBR={dev:"Dev",ing:"Ingest",man:"Manip",mon:"Monitor",prf:"Perf",sec:"Security",gov:"Gov",dbg:"Debug",mod:"Model",
+  a_plat:"Platform",a_load:"Ingest",a_xfm:"Transform",a_jobs:"Jobs",a_cicd:"CI/CD",a_trb:"Troubleshoot",a_gov:"Gov"};
+var dashUsers=null,dashErr="",dashLoading=false;
+function loadDash(){
+  dashLoading=true;dashErr="";
+  return fetch(SHEETS_URL+"?action=all",{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){
+    sheetV=+j.v||1;
+    if(sheetV<3)throw new Error("old");
+    if(!j.ok)throw new Error(j.error||"load failed");
+    dashUsers=j.users||[];
+  }).catch(function(e){
+    dashErr=e.message==="old"?"The group dashboard needs the latest Apps Script. Redeploy it as described in SHEETS_SETUP.md, then refresh.":"Could not load the group's progress just now.";
+  }).then(function(){dashLoading=false;if(view==="dash")dash()});
+}
+function heatBg(p){return "color-mix(in srgb,var(--blue) "+Math.round(6+p*0.94)+"%,var(--surface))"}
+function dash(fetchNow){
+  stopTimer();view="dash";ses=null;
+  if(HOSTED){group();return}
+  var E=EXAMS[curExam];
+  var h='<button class="btn link" id="back" type="button">&larr; Back</button>'+
+    '<h1 style="font-size:clamp(1.9rem,7vw,2.8rem);margin-top:8px">Group dashboard</h1>'+
+    '<div class="seg" role="group" aria-label="Choose the exam"><button type="button" class="segbtn" data-dexam="pro" aria-pressed="'+(curExam==="pro")+'">Professional</button><button type="button" class="segbtn" data-dexam="assoc" aria-pressed="'+(curExam==="assoc")+'">Associate</button></div>'+
+    '<p class="lede">How everyone using this quiz is doing on the '+esc(E.short)+' exam. "Right" means right on the last try, out of the built-in questions.</p>';
+  if(!SHEETS_URL||!localUser){app.innerHTML=h+'<p class="small" style="margin-top:20px">The dashboard needs Google Sheets sync. See SHEETS_SETUP.md.</p>';bindDash();return}
+  if(fetchNow||(!dashUsers&&!dashLoading&&!dashErr))loadDash();
+  if(dashErr){app.innerHTML=h+'<p class="err" style="margin-top:20px">'+esc(dashErr)+'</p><div class="actions"><button class="btn" id="drefresh" type="button">Try again</button></div>';bindDash();return}
+  if(!dashUsers){app.innerHTML=h+'<p class="small" style="margin-top:20px">Loading the group’s progress...</p>';bindDash();return}
+
+  var secs=SECTIONS,now=Date.now(),WEEK=7*864e5;
+  var rows=dashUsers.map(function(u){
+    var sc=(u.sectionScores||{})[curExam]||{},a=0,c=0,t=0,by={};
+    secs.forEach(function(s){var x=sc[s.id]||{},tt=+x.total||QUESTIONS.filter(function(q){return q.s===s.id}).length;
+      by[s.id]={a:+x.answered||0,c:+x.correct||0,t:tt};a+=by[s.id].a;c+=by[s.id].c;t+=tt});
+    var mock=curExam==="assoc"?u.mockBestAssoc:u.mockBestPro;
+    return {name:u.username,a:a,c:c,t:t,by:by,mock:typeof mock==="number"&&mock>=0?mock:null,last:+u.lastUpdated||0,qa:+u.questionsAdded||0,me:u.username===localUser};
+  }).sort(function(x,y){return y.c-x.c||y.a-x.a||x.name.localeCompare(y.name)});
+  var active=rows.filter(function(r){return r.a>0});
+  var sumA=0,sumC=0;rows.forEach(function(r){sumA+=r.a;sumC+=r.c});
+  var week=rows.filter(function(r){return now-r.last<WEEK}).length;
+
+  var kpi='<div class="kpis">'+
+    '<div class="kpi"><b>'+rows.length+'</b><span>learners</span></div>'+
+    '<div class="kpi"><b>'+week+'</b><span>active in the last 7 days</span></div>'+
+    '<div class="kpi"><b>'+sumA+'</b><span>questions tried</span></div>'+
+    '<div class="kpi"><b>'+(sumA?pct(sumC,sumA)+'%':'–')+'</b><span>of tried questions right</span></div></div>';
+
+  /* group figures per section */
+  var gs=secs.map(function(s){
+    var a=0,c=0,m=0;active.forEach(function(r){var b=r.by[s.id];a+=b.a;c+=b.c;m+=b.t?b.c/b.t:0});
+    return {s:s,a:a,c:c,acc:a?c/a:null,mastery:active.length?m/active.length:0};
+  });
+  var ins=[];
+  if(active.length){
+    var tried=gs.filter(function(g){return g.a>=3});
+    if(tried.length>1){
+      var weak=tried.slice().sort(function(x,y){return x.acc-y.acc})[0],strong=tried.slice().sort(function(x,y){return y.acc-x.acc})[0];
+      ins.push(['--pink','<b>Weakest section:</b> '+esc(weak.s.name)+' – only '+Math.round(100*weak.acc)+'% of tried questions are right. Worth a group review.']);
+      if(strong!==weak)ins.push(['--lime','<b>Strongest section:</b> '+esc(strong.s.name)+' ('+Math.round(100*strong.acc)+'% right).']);
+    }
+    gs.forEach(function(g){var cv=0;active.forEach(function(r){var b=r.by[g.s.id];cv+=b.t?b.a/b.t:0});g.cov=cv/active.length});
+    var least=gs.slice().sort(function(x,y){return x.cov-y.cov})[0];
+    ins.push(['--yellow','<b>Least practised:</b> '+esc(least.s.name)+' – on average people have tried '+Math.round(100*least.cov)+'% of its questions.']);
+    var lead=rows[0];if(lead&&lead.c)ins.push(['--cyan','<b>Most questions right:</b> '+esc(lead.name)+' with '+lead.c+' of '+lead.t+'.']);
+    var bm=rows.filter(function(r){return r.mock!==null}).sort(function(x,y){return y.mock-x.mock})[0];
+    if(bm)ins.push(['--violet','<b>Best mock exam:</b> '+esc(bm.name)+' scored '+bm.mock+'%.']);
+    var meI=-1;rows.forEach(function(r,i){if(r.me)meI=i});
+    if(meI>=0&&rows.length>1)ins.push(['--orange','<b>You</b> are #'+(meI+1)+' of '+rows.length+' by questions right.']);
+  }
+  var insights=ins.length?'<h2 style="margin-top:30px">Insights</h2><ul class="insights">'+ins.map(function(x){return '<li style="border-left-color:var('+x[0]+')">'+x[1]+'</li>'}).join("")+'</ul>':
+    '<p class="small" style="margin-top:24px">Insights appear once people start answering '+esc(E.short)+' questions.</p>';
+
+  var board='<h2 style="margin-top:30px">Leaderboard</h2><div class="panel"><table class="dt"><thead><tr><th class="n">#</th><th>Learner</th><th class="n">Right</th><th class="n">Tried</th><th>Accuracy</th><th class="n">Best mock</th><th class="n">Own Qs</th><th>Last active</th></tr></thead><tbody>'+
+    rows.map(function(r,i){var ac=r.a?pct(r.c,r.a):0;
+      return '<tr'+(r.me?' class="me"':'')+'><td class="n">'+(i+1)+'</td><td><b>'+esc(r.name)+'</b>'+(r.me?'<span class="tag">you</span>':'')+'</td><td class="n">'+r.c+'</td><td class="n">'+r.a+'</td>'+
+        '<td title="'+r.c+' right of '+r.a+' tried"><span class="mbar" aria-hidden="true"><i style="width:'+ac+'%"></i></span>'+(r.a?ac+'%':'–')+'</td>'+
+        '<td class="n">'+(r.mock!==null?r.mock+'%':'–')+'</td><td class="n">'+r.qa+'</td><td>'+(r.last?esc(ago(r.last)):'–')+'</td></tr>'}).join("")+
+    '</tbody></table></div>';
+
+  var heat='<h2 style="margin-top:30px">Section mastery</h2><p class="small" style="margin-top:4px">Share of each section’s built-in questions a person has right. Darker is better; hover a cell for the count.</p>'+
+    '<div class="panel"><table class="dt heat"><thead><tr><th>Learner</th>'+secs.map(function(s){return '<th class="c" title="'+esc(s.name)+'">'+esc(ABBR[s.id]||s.name)+'</th>'}).join("")+'</tr></thead><tbody>'+
+    rows.map(function(r){return '<tr><td><b>'+esc(r.name)+'</b></td>'+secs.map(function(s){
+      var b=r.by[s.id],p=b.t?Math.round(100*b.c/b.t):0;
+      return '<td class="h" style="background:'+heatBg(p)+';color:'+(p>=55?'#fff':'var(--ink)')+'" title="'+esc(r.name+' · '+s.name+': '+b.c+' of '+b.t+' right, '+b.a+' tried')+'">'+p+'%</td>'}).join("")+'</tr>'}).join("")+
+    '</tbody></table></div><div class="legend"><span>0%</span><span class="ramp" aria-hidden="true"></span><span>100%</span></div>';
+
+  var bars='<h2 style="margin-top:30px">Group average by section</h2><p class="small" style="margin-top:4px">Average mastery across everyone who has started the '+esc(E.short)+' exam.</p>'+
+    '<div class="panel"><div class="sbars">'+gs.map(function(g){var p=Math.round(100*g.mastery);
+      return '<span>'+esc(g.s.name)+'</span><span class="track" title="'+esc(g.s.name)+': '+p+'% average mastery, '+(g.acc===null?'no answers yet':Math.round(100*g.acc)+'% of '+g.a+' tried answers right')+'"><i style="width:'+p+'%"></i></span><span class="v">'+p+'%</span>'}).join("")+
+    '</div></div>';
+
+  app.innerHTML=h+kpi+insights+board+(active.length?heat+bars:'')+
+    '<div class="actions"><button class="btn" id="drefresh" type="button">Refresh</button><span class="small">Everyone who uses this quiz can see this dashboard.</span></div>';
+  bindDash();
+}
+function bindDash(){
+  document.getElementById("back").onclick=home;
+  Array.prototype.forEach.call(document.querySelectorAll("[data-dexam]"),function(b){b.onclick=function(){
+    var w=b.getAttribute("data-dexam");if(w===curExam)return;store.which=w;save();setExam(w);dash()}});
+  var r=document.getElementById("drefresh");if(r)r.onclick=function(){dashUsers=null;dashErr="";dash(true)};
+}
+
 /* ---------- Google Sheets API (Apps Script Web App) ---------- */
 /* Fetch one user's row. Resolves to the stored data, or null if the user has no row yet. */
 function loadProgress(username){
@@ -1341,9 +1816,10 @@ function fromSheetQuestion(r){
   if(r.code)rec.c=r.code;
   return rec;
 }
-var sheetV=0; /* 2 = the deployed script has the Questions tab; older scripts only keep questions inside State */
-var syncedBank=null; /* question bank as last confirmed in the sheet; only resend it when it changes */
+var sheetV=0; /* what the deployed script supports: 2 = Questions tab, 3 = Notes tab, pictures and the group dashboard. Older scripts keep those inside State */
+var syncedBank=null,syncedNotes=null; /* as last confirmed in the sheet; only resend when they change */
 function bankSig(){return JSON.stringify([store.custom,store.custom.map(function(c){return !!store.exam[c.id]})])}
+function notesSig(){return JSON.stringify(store.notes)}
 /* The row written for the current user: summary columns for reading the sheet, plus the full state for syncing. */
 function progressData(){
   var st=store.stats,answered=0,correct=0;
@@ -1357,20 +1833,26 @@ function progressData(){
     sectionScores:{pro:secs(PRO_SECTIONS),assoc:secs(ASSOC_SECTIONS)},
     mockBestPro:typeof store.mockBest==="number"?store.mockBest:null,
     mockBestAssoc:typeof store.mockBestA==="number"?store.mockBestA:null,
-    lastUpdated:store.updated||Date.now(),state:sheetV>=2?stateOnly():store};
+    lastUpdated:store.updated||Date.now(),state:stateOnly()};
 }
-function stateOnly(){var o={};Object.keys(store).forEach(function(k){if(k!=="custom")o[k]=store[k]});return o}
+function stateOnly(){
+  var o={};
+  Object.keys(store).forEach(function(k){if(!(k==="custom"&&sheetV>=2)&&!(k==="notes"&&sheetV>=3))o[k]=store[k]});
+  return o;
+}
 var sheetPending=false,sheetBusy=false,sheetTimer=null;
 function sheetFlush(keepalive){
   clearTimeout(sheetTimer);sheetTimer=null;
   if(!localUser||!SHEETS_URL||!sheetPending)return;
   if(sheetBusy){sheetTimer=setTimeout(sheetFlush,800);return}
   sheetPending=false;sheetBusy=true;
-  var who=localUser,data=progressData(),sig=bankSig();
+  var who=localUser,data=progressData(),sig=bankSig(),nsig=notesSig();
   if(sheetV>=2&&sig!==syncedBank)data.questions=store.custom.map(toSheetQuestion);
+  if(sheetV>=3&&nsig!==syncedNotes)data.notes=toSheetNotes(store.notes);
   saveProgress(who,data,{keepalive:keepalive}).then(function(res){
     if(res.stale&&who===localUser)return pullSheet();
     if(who===localUser&&data.questions)syncedBank=sig;
+    if(who===localUser&&data.notes)syncedNotes=nsig;
     syncState="sheet";setNote();
   }).catch(function(){sheetPending=true;syncState="error";setNote()})
     .then(function(){sheetBusy=false});
@@ -1386,11 +1868,14 @@ function pullSheet(){
       store=remote.state;store.updated=remote.lastUpdated;
       /* questions live in their own tab; rows saved before that existed keep them inside state */
       if(Array.isArray(remote.questions))store.custom=remote.questions.map(fromSheetQuestion);
+      if(Array.isArray(remote.notes))store.notes=fromSheetNotes(remote.notes);
       norm();setExam(store.which);
-      if(Array.isArray(remote.questions))syncedBank=bankSig();
-      else if(store.custom.length){syncedBank=null;sheetPending=true;setTimeout(sheetFlush,0)} /* move them into the Questions tab */
+      syncedBank=Array.isArray(remote.questions)?bankSig():null;
+      syncedNotes=Array.isArray(remote.notes)?notesSig():null;
+      /* rows saved by an older script keep these inside State; move them into their own tabs */
+      if((!syncedBank&&store.custom.length)||(!syncedNotes&&store.notes.length)){sheetPending=true;setTimeout(sheetFlush,0)}
       writeJSON(KEY,store);
-      if(view==="home")home();else if(view==="bank")bank();
+      if(view==="home")home();else if(view==="bank")bank();else if(view==="notes")notesPage();
     }else if(hasContent()&&(!remote||(store.updated||0)>(remote.lastUpdated||0))){
       sheetPending=true;sheetFlush();
     }
@@ -1400,7 +1885,7 @@ function pullSheet(){
 document.addEventListener("visibilitychange",function(){
   if(!localUser||!SHEETS_URL)return;
   if(document.visibilityState==="hidden")sheetFlush(true);
-  else if(!ses&&!sheetPending)pullSheet();
+  else if(!ses&&!sheetPending&&!noteDraft&&!noteRename)pullSheet();
 });
 
 /* ---------- username (used when the page is not running inside Claude) ---------- */
@@ -1454,7 +1939,7 @@ function useName(n){
   try{localStorage.setItem(CUR_KEY,n)}catch(e){}
   if(first&&!readJSON(KEY)){var legacy=readJSON(BASEKEY);if(legacy)writeJSON(KEY,legacy)}
   store=load();norm();setExam(store.which);
-  syncState="local";sheetPending=false;syncedBank=null;
+  syncState="local";sheetPending=false;syncedBank=null;syncedNotes=null;
   home();
   if(SHEETS_URL)pullSheet();
 }
